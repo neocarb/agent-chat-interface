@@ -303,9 +303,9 @@ export function Thread() {
                   </Button>
                 )}
               </div>
-              <div className="absolute top-2 right-4 flex items-center">
+              {/* <div className="absolute top-2 right-4 flex items-center">
                 <OpenGitHubRepo />
-              </div>
+              </div> */}
             </div>
           )}
           {chatStarted && (
@@ -338,20 +338,20 @@ export function Thread() {
                     damping: 30,
                   }}
                 >
-                  <LangGraphLogoSVG
+                  {/* <LangGraphLogoSVG
                     width={32}
                     height={32}
-                  />
+                  /> */}
                   <span className="text-xl font-semibold tracking-tight">
-                    Agent Chat
+                    Flight Booking Agent
                   </span>
                 </motion.button>
               </div>
 
               <div className="flex items-center gap-4">
-                <div className="flex items-center">
+                {/* <div className="flex items-center">
                   <OpenGitHubRepo />
-                </div>
+                </div> */}
                 <TooltipIconButton
                   size="lg"
                   className="p-4"
@@ -414,9 +414,9 @@ export function Thread() {
                 <div className="sticky bottom-0 flex flex-col items-center gap-8 bg-white">
                   {!chatStarted && (
                     <div className="flex items-center gap-3">
-                      <LangGraphLogoSVG className="h-8 flex-shrink-0" />
+                      {/* <LangGraphLogoSVG className="h-8 flex-shrink-0" /> */}
                       <h1 className="text-2xl font-semibold tracking-tight">
-                        Agent Chat
+                        Flight Booking Agent
                       </h1>
                     </div>
                   )}
