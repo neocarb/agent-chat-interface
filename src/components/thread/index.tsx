@@ -119,7 +119,7 @@ export function Thread() {
   );
   const [hideToolCalls, setHideToolCalls] = useQueryState(
     "hideToolCalls",
-    parseAsBoolean.withDefault(false),
+    parseAsBoolean.withDefault(true),
   );
   const [input, setInput] = useState("Hi, I want to book a flight");
   const [firstTokenReceived, setFirstTokenReceived] = useState(false);
@@ -457,7 +457,7 @@ export function Thread() {
                           <div className="flex items-center space-x-2">
                             <Switch
                               id="render-tool-calls"
-                              checked={hideToolCalls ?? false}
+                              checked={hideToolCalls}
                               onCheckedChange={setHideToolCalls}
                             />
                             <Label
