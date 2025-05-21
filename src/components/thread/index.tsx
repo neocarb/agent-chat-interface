@@ -119,9 +119,9 @@ export function Thread() {
   );
   const [hideToolCalls, setHideToolCalls] = useQueryState(
     "hideToolCalls",
-    parseAsBoolean.withDefault(false),
+    parseAsBoolean.withDefault(true),
   );
-  const [input, setInput] = useState("");
+  const [input, setInput] = useState("Hi, I want to book a flight");
   const [firstTokenReceived, setFirstTokenReceived] = useState(false);
   const isLargeScreen = useMediaQuery("(min-width: 1024px)");
 
@@ -303,9 +303,9 @@ export function Thread() {
                   </Button>
                 )}
               </div>
-              <div className="absolute top-2 right-4 flex items-center">
+              {/* <div className="absolute top-2 right-4 flex items-center">
                 <OpenGitHubRepo />
-              </div>
+              </div> */}
             </div>
           )}
           {chatStarted && (
@@ -338,20 +338,20 @@ export function Thread() {
                     damping: 30,
                   }}
                 >
-                  <LangGraphLogoSVG
+                  {/* <LangGraphLogoSVG
                     width={32}
                     height={32}
-                  />
+                  /> */}
                   <span className="text-xl font-semibold tracking-tight">
-                    Agent Chat
+                    Flight Booking Agent
                   </span>
                 </motion.button>
               </div>
 
               <div className="flex items-center gap-4">
-                <div className="flex items-center">
+                {/* <div className="flex items-center">
                   <OpenGitHubRepo />
-                </div>
+                </div> */}
                 <TooltipIconButton
                   size="lg"
                   className="p-4"
@@ -413,11 +413,15 @@ export function Thread() {
               footer={
                 <div className="sticky bottom-0 flex flex-col items-center gap-8 bg-white">
                   {!chatStarted && (
-                    <div className="flex items-center gap-3">
-                      <LangGraphLogoSVG className="h-8 flex-shrink-0" />
+                    <div className="flex flex-col items-center gap-2">
+                      {/* <LangGraphLogoSVG className="h-8 flex-shrink-0" /> */}
                       <h1 className="text-2xl font-semibold tracking-tight">
-                        Agent Chat
+                        Flight Booking Agent
                       </h1>
+                      <p className="text-gray-500 text-center max-w-md text-sm">
+                        This agent can help you book flights in 4 super easy steps: search flights, select flight, enter your details and make payment. <br/>
+                        Try "Hi, I want to book a flight" to get started!
+                      </p>
                     </div>
                   )}
 
@@ -453,7 +457,7 @@ export function Thread() {
                           <div className="flex items-center space-x-2">
                             <Switch
                               id="render-tool-calls"
-                              checked={hideToolCalls ?? false}
+                              checked={hideToolCalls}
                               onCheckedChange={setHideToolCalls}
                             />
                             <Label
