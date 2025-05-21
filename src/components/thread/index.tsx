@@ -448,8 +448,13 @@ export function Thread() {
                             form?.requestSubmit();
                           }
                         }}
-                        placeholder="Type your message..."
+                        placeholder={
+                          stream.interrupt
+                            ? "Enter your respone to the assistant in the text box above..."
+                            : "Type your message..."
+                        }
                         className="field-sizing-content resize-none border-none bg-transparent p-3.5 pb-0 shadow-none ring-0 outline-none focus:ring-0 focus:outline-none"
+                        disabled={!!stream.interrupt}
                       />
 
                       <div className="flex items-center justify-between p-2 pt-4">
