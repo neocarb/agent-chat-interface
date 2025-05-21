@@ -419,7 +419,7 @@ export function Thread() {
                         Flight Booking Agent
                       </h1>
                       <p className="text-gray-500 text-center max-w-md text-sm">
-                        This agent can help you book flights in 4 super easy steps: search flights, select flight, enter passenger details and make payment. <br/>
+                        This agent can help you book flights in 4 super easy steps: search flights, select flight, enter your details and make payment. <br/>
                         Try "Hi, I want to book a flight" to get started!
                       </p>
                     </div>
