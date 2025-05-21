@@ -121,7 +121,7 @@ export function Thread() {
     "hideToolCalls",
     parseAsBoolean.withDefault(false),
   );
-  const [input, setInput] = useState("");
+  const [input, setInput] = useState("Hi, I want to book a flight");
   const [firstTokenReceived, setFirstTokenReceived] = useState(false);
   const isLargeScreen = useMediaQuery("(min-width: 1024px)");
 
@@ -413,11 +413,15 @@ export function Thread() {
               footer={
                 <div className="sticky bottom-0 flex flex-col items-center gap-8 bg-white">
                   {!chatStarted && (
-                    <div className="flex items-center gap-3">
+                    <div className="flex flex-col items-center gap-2">
                       {/* <LangGraphLogoSVG className="h-8 flex-shrink-0" /> */}
                       <h1 className="text-2xl font-semibold tracking-tight">
                         Flight Booking Agent
                       </h1>
+                      <p className="text-gray-500 text-center max-w-md text-sm">
+                        This agent can help you book flights in 4 super easy steps: search flights, select flight, enter passenger details and make payment. <br/>
+                        Try "Hi, I want to book a flight" to get started!
+                      </p>
                     </div>
                   )}
 
