@@ -19,7 +19,7 @@ npx create-agent-chat-app
 or
 
 ```bash
-git clone https://github.com/langchain-ai/agent-chat-ui.git
+https://github.com/neocarb/agent-chat-ui-v2.git
 
 cd agent-chat-ui
 ```
