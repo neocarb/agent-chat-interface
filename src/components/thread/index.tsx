@@ -1,5 +1,6 @@
 import { v4 as uuidv4 } from "uuid";
 import { ReactNode, useEffect, useRef } from "react";
+import { RefreshCcw } from "lucide-react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { useStreamContext } from "@/providers/Stream";
@@ -288,7 +289,7 @@ export function Thread() {
         >
           {!chatStarted && (
             <div className="absolute top-0 left-0 z-10 flex w-full items-center justify-between gap-3 p-2 pl-4">
-              <div>
+              {/* <div>
                 {(!chatHistoryOpen || !isLargeScreen) && (
                   <Button
                     className="hover:bg-gray-100"
@@ -302,7 +303,7 @@ export function Thread() {
                     )}
                   </Button>
                 )}
-              </div>
+              </div> */}
               {/* <div className="absolute top-2 right-4 flex items-center">
                 <OpenGitHubRepo />
               </div> */}
@@ -311,7 +312,7 @@ export function Thread() {
           {chatStarted && (
             <div className="relative z-10 flex items-center justify-between gap-3 p-2">
               <div className="relative flex items-center justify-start gap-2">
-                <div className="absolute left-0 z-10">
+                {/* <div className="absolute left-0 z-10">
                   {(!chatHistoryOpen || !isLargeScreen) && (
                     <Button
                       className="hover:bg-gray-100"
@@ -325,7 +326,7 @@ export function Thread() {
                       )}
                     </Button>
                   )}
-                </div>
+                </div> */}
                 <motion.button
                   className="flex cursor-pointer items-center gap-2"
                   onClick={() => setThreadId(null)}
@@ -352,7 +353,7 @@ export function Thread() {
                 {/* <div className="flex items-center">
                   <OpenGitHubRepo />
                 </div> */}
-                <TooltipIconButton
+                {/* <TooltipIconButton
                   size="lg"
                   className="p-4"
                   tooltip="New thread"
@@ -360,7 +361,7 @@ export function Thread() {
                   onClick={() => setThreadId(null)}
                 >
                   <SquarePen className="size-5" />
-                </TooltipIconButton>
+                </TooltipIconButton> */}
               </div>
 
               <div className="from-background to-background/0 absolute inset-x-0 top-full h-5 bg-gradient-to-b" />
@@ -418,8 +419,10 @@ export function Thread() {
                       <h1 className="text-2xl font-semibold tracking-tight">
                         Flight Booking Agent
                       </h1>
-                      <p className="text-gray-500 text-center max-w-md text-sm">
-                        This agent can help you book flights in 4 super easy steps: search flights, select flight, enter your details and make payment. <br/>
+                      <p className="max-w-md text-center text-sm text-gray-500">
+                        This agent can help you book flights in 4 super easy
+                        steps: search flights, select flight, enter your details
+                        and make payment. <br />
                         Try "Hi, I want to book a flight" to get started!
                       </p>
                     </div>
@@ -473,23 +476,37 @@ export function Thread() {
                             </Label>
                           </div>
                         </div>
-                        {stream.isLoading ? (
-                          <Button
-                            key="stop"
-                            onClick={() => stream.stop()}
-                          >
-                            <LoaderCircle className="h-4 w-4 animate-spin" />
-                            Cancel
-                          </Button>
-                        ) : (
-                          <Button
-                            type="submit"
-                            className="shadow-md transition-all"
-                            disabled={isLoading || !input.trim()}
-                          >
-                            Send
-                          </Button>
-                        )}
+                        <div className="flex items-center space-x-1">
+                          <div className="">
+                            <TooltipIconButton
+                              tooltip="Reset"
+                              variant="ghost"
+                              className="bg-muted rounded-md border px-5 py-5 shadow-xs"
+                              onClick={() => setThreadId(null)}
+                            >
+                              <RefreshCcw className="size-5" />
+                              {/* Reset */}
+                            </TooltipIconButton>
+                          </div>
+
+                          {stream.isLoading ? (
+                            <Button
+                              key="stop"
+                              onClick={() => stream.stop()}
+                            >
+                              <LoaderCircle className="h-4 w-4 animate-spin" />
+                              Cancel
+                            </Button>
+                          ) : (
+                            <Button
+                              type="submit"
+                              className="ml-3 shadow-md transition-all"
+                              disabled={isLoading || !input.trim()}
+                            >
+                              Send
+                            </Button>
+                          )}
+                        </div>
                       </div>
                     </form>
                   </div>
