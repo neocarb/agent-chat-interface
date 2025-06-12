@@ -50,7 +50,7 @@ export function ThreadView({ interrupt }: ThreadViewProps) {
           handleShowSidePanel={handleShowSidePanel}
           showState={showState}
           showDescription={showDescription}
-        />
+          />
       )}
     </div>
   );

@@ -317,7 +317,7 @@ export function Thread() {
                       className="hover:bg-gray-100"
                       variant="ghost"
                       onClick={() => setChatHistoryOpen((p) => !p)}
-                    >
+                    > 
                       {chatHistoryOpen ? (
                         <PanelRightOpen className="size-5" />
                       ) : (
@@ -338,13 +338,13 @@ export function Thread() {
                     damping: 30,
                   }}
                 >
-                  {/* <LangGraphLogoSVG
+                {/* <LangGraphLogoSVG
                     width={32}
                     height={32}
                   /> */}
                   <span className="text-xl font-semibold tracking-tight">
-                    Flight Booking Agent
-                  </span>
+                  Flight Booking Agent
+                </span>
                 </motion.button>
               </div>
 
