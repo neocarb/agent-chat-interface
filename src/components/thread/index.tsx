@@ -480,6 +480,7 @@ export function Thread() {
                           <div className="">
                             <TooltipIconButton
                               tooltip="Reset"
+                              type="button"
                               variant="ghost"
                               className="bg-muted rounded-md border px-5 py-5 shadow-xs"
                               onClick={() => setThreadId(null)}
