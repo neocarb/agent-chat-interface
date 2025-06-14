@@ -8,6 +8,8 @@ import { Button } from "../ui/button";
 import { Checkpoint, Message } from "@langchain/langgraph-sdk";
 import { AssistantMessage, AssistantMessageLoading } from "./messages/ai";
 import { HumanMessage } from "./messages/human";
+import { Textarea } from "@/components/ui/textarea";
+import { HumanResponseWithEdits, SubmitType } from "./agent-inbox/types";
 import {
   DO_NOT_RENDER_ID_PREFIX,
   ensureToolCallsHaveResponses,
@@ -233,6 +235,88 @@ export function Thread() {
     (m) => m.type === "ai" || m.type === "tool",
   );
 
+  // for Textarea component
+
+  const [humanResponse, setHumanResponse] = useState<HumanResponseWithEdits[]>([
+    {
+      type: "response",
+      args: "",
+      acceptAllowed: true,
+      editsMade: false,
+    },
+  ]);
+
+  const [hasAddedResponse, setHasAddedResponse] = useState(false);
+  const [selectedSubmitType, setSelectedSubmitType] =
+    useState<SubmitType>("response");
+    
+  const hasEdited =
+    humanResponse.find((r) => r.type === "response")?.editsMade ?? false;
+
+  type SubmitType = "edit" | "accept" | "response";
+
+  const onResponseChange = (
+    change: string,
+    response: HumanResponseWithEdits,
+  ) => {
+    if (!change) {
+      setHasAddedResponse(false);
+      if (hasEdited) {
+        // The user has deleted their response, so we should set the submit type to
+        // `edit` if they've edited, or `accept` if it's allowed and they have not edited.
+        setSelectedSubmitType("edit");
+      } else if (response.acceptAllowed) {
+        setSelectedSubmitType("accept");
+      }
+    } else {
+      setSelectedSubmitType("response");
+      setHasAddedResponse(true);
+    }
+
+    setHumanResponse((prev) => {
+      const newResponse: HumanResponseWithEdits = {
+        type: response.type,
+        args: change,
+      };
+
+      if (prev.find((p) => p.type === response.type)) {
+        return prev.map((p) => {
+          if (p.type === response.type) {
+            if (p.acceptAllowed) {
+              return {
+                ...newResponse,
+                acceptAllowed: true,
+                editsMade: !!change,
+              };
+            }
+            return newResponse;
+          }
+          return p;
+        });
+      } else {
+        throw new Error("No human response found for string response");
+      }
+    });
+  };
+
+  const res = humanResponse.find((r) => r.type === "response");
+  if (!res || typeof res.args !== "string") {
+    return null;
+  }
+  const handleSubmit2 = async (
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent> | React.KeyboardEvent,
+  ) => {
+    e.preventDefault();
+    console.log("Submitting", humanResponse);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
+      e.preventDefault();
+      handleSubmit2(e);
+    }
+  };
+
   return (
     <div className="flex h-screen w-full overflow-hidden">
       <div className="relative hidden lg:flex">
@@ -317,7 +401,7 @@ export function Thread() {
                       className="hover:bg-gray-100"
                       variant="ghost"
                       onClick={() => setChatHistoryOpen((p) => !p)}
-                    > 
+                    >
                       {chatHistoryOpen ? (
                         <PanelRightOpen className="size-5" />
                       ) : (
@@ -338,13 +422,13 @@ export function Thread() {
                     damping: 30,
                   }}
                 >
-                {/* <LangGraphLogoSVG
+                  {/* <LangGraphLogoSVG
                     width={32}
                     height={32}
                   /> */}
                   <span className="text-xl font-semibold tracking-tight">
-                  Flight Booking Agent
-                </span>
+                    Flight Booking Agent
+                  </span>
                 </motion.button>
               </div>
 
@@ -418,8 +502,10 @@ export function Thread() {
                       <h1 className="text-2xl font-semibold tracking-tight">
                         Flight Booking Agent
                       </h1>
-                      <p className="text-gray-500 text-center max-w-md text-sm">
-                        This agent can help you book flights in 4 super easy steps: search flights, select flight, enter your details and make payment. <br/>
+                      <p className="max-w-md text-center text-sm text-gray-500">
+                        This agent can help you book flights in 4 super easy
+                        steps: search flights, select flight, enter your details
+                        and make payment. <br />
                         Try "Hi, I want to book a flight" to get started!
                       </p>
                     </div>
@@ -492,6 +578,24 @@ export function Thread() {
                         )}
                       </div>
                     </form>
+                    {/*  to handle inbetween response  */}
+                    <div>
+                      <Textarea
+                        disabled={false}
+                        value={res.args}
+                        onChange={(e) => onResponseChange(e.target.value, res)}
+                        onKeyDown={handleKeyDown}
+                        rows={4}
+                        placeholder="Your response here..."
+                      />
+                      <Button
+                        variant="brand"
+                        disabled={false}
+                        onClick={handleSubmit2}
+                      >
+                        Send Response
+                      </Button>
+                    </div>
                   </div>
                 </div>
               }

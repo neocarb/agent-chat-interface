@@ -109,6 +109,7 @@ function ResponseComponent({
   return (
     <div className="flex w-full flex-col items-start gap-4 rounded-xl border-[1px] border-gray-300 p-6">
       <div className="flex w-full items-center justify-between">
+        <p>response from inbox-item-input</p>
         <p className="text-base font-semibold text-black">
           Respond to assistant
         </p>
@@ -120,7 +121,10 @@ function ResponseComponent({
       </div>
 
       {showArgsInResponse && (
-        <ArgsRenderer args={interruptValue.action_request.args} />
+        <>
+          <p>showArgsInResponse</p>
+          <ArgsRenderer args={interruptValue.action_request.args} />
+        </>
       )}
 
       <div className="flex w-full flex-col items-start gap-[6px]">
@@ -287,6 +291,7 @@ function EditAndOrAcceptComponent({
             key={`allow-edit-args--${k}-${idx}`}
           >
             <div className="flex w-full flex-col items-start gap-[6px]">
+              <p className="min-w-fit text-sm font-medium">{prettifyText(k)}  </p>
               <p className="min-w-fit text-sm font-medium">{prettifyText(k)}</p>
               <Textarea
                 disabled={streaming}
