@@ -44,6 +44,7 @@ import {
   useArtifactContext,
 } from "./artifact";
 
+
 function StickyToBottomContent(props: {
   content: ReactNode;
   footer?: ReactNode;
