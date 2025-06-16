@@ -129,7 +129,7 @@ export function Thread() {
   const isLargeScreen = useMediaQuery("(min-width: 1024px)");
 
   const stream = useStreamContext();
-  console.log("stream", stream);
+  // console.log("stream", stream);
   const messages = stream.messages;
   const isLoading = stream.isLoading;
 
@@ -250,7 +250,7 @@ export function Thread() {
   const [hasAddedResponse, setHasAddedResponse] = useState(false);
   const [selectedSubmitType, setSelectedSubmitType] =
     useState<SubmitType>("response");
-    
+
   const hasEdited =
     humanResponse.find((r) => r.type === "response")?.editsMade ?? false;
 
@@ -536,9 +536,11 @@ export function Thread() {
                           }
                         }}
                         placeholder={
-                          stream.interrupt
-                            ? "Enter your respone to the assistant in the text box above..."
-                            : "Type your message..."
+                          stream.messages.length === 0
+                            ? "Type your message..."
+                            : stream.interrupt
+                              ? "Type your message..."
+                              : "Please wait for the response..."
                         }
                         className="field-sizing-content resize-none border-none bg-transparent p-3.5 pb-0 shadow-none ring-0 outline-none focus:ring-0 focus:outline-none"
                         // disabled={!!stream.interrupt}
@@ -599,7 +601,7 @@ export function Thread() {
                       </div>
                     </form>
                     {/*  to handle inbetween response  */}
-                    <div>
+                    {/* <div>
                       <Textarea
                         disabled={false}
                         value={res.args}
@@ -615,7 +617,7 @@ export function Thread() {
                       >
                         Send Response
                       </Button>
-                    </div>
+                    </div> */}
                   </div>
                 </div>
               }
