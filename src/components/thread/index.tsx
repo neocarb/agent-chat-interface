@@ -1,5 +1,6 @@
 import { v4 as uuidv4 } from "uuid";
 import { ReactNode, useEffect, useRef } from "react";
+import { RefreshCcw } from "lucide-react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { useStreamContext } from "@/providers/Stream";
@@ -128,6 +129,7 @@ export function Thread() {
   const isLargeScreen = useMediaQuery("(min-width: 1024px)");
 
   const stream = useStreamContext();
+  console.log("stream", stream);
   const messages = stream.messages;
   const isLoading = stream.isLoading;
 
@@ -152,7 +154,6 @@ export function Thread() {
         // Message has already been logged. do not modify ref, return early.
         return;
       }
-
       // Message is defined, and it has not been logged yet. Save it, and send the error
       lastError.current = message;
       toast.error("An error occurred. Please try again.", {
@@ -372,7 +373,7 @@ export function Thread() {
         >
           {!chatStarted && (
             <div className="absolute top-0 left-0 z-10 flex w-full items-center justify-between gap-3 p-2 pl-4">
-              <div>
+              {/* <div>
                 {(!chatHistoryOpen || !isLargeScreen) && (
                   <Button
                     className="hover:bg-gray-100"
@@ -386,7 +387,7 @@ export function Thread() {
                     )}
                   </Button>
                 )}
-              </div>
+              </div> */}
               {/* <div className="absolute top-2 right-4 flex items-center">
                 <OpenGitHubRepo />
               </div> */}
@@ -395,7 +396,7 @@ export function Thread() {
           {chatStarted && (
             <div className="relative z-10 flex items-center justify-between gap-3 p-2">
               <div className="relative flex items-center justify-start gap-2">
-                <div className="absolute left-0 z-10">
+                {/* <div className="absolute left-0 z-10">
                   {(!chatHistoryOpen || !isLargeScreen) && (
                     <Button
                       className="hover:bg-gray-100"
@@ -409,7 +410,7 @@ export function Thread() {
                       )}
                     </Button>
                   )}
-                </div>
+                </div> */}
                 <motion.button
                   className="flex cursor-pointer items-center gap-2"
                   onClick={() => setThreadId(null)}
@@ -436,7 +437,7 @@ export function Thread() {
                 {/* <div className="flex items-center">
                   <OpenGitHubRepo />
                 </div> */}
-                <TooltipIconButton
+                {/* <TooltipIconButton
                   size="lg"
                   className="p-4"
                   tooltip="New thread"
@@ -444,7 +445,7 @@ export function Thread() {
                   onClick={() => setThreadId(null)}
                 >
                   <SquarePen className="size-5" />
-                </TooltipIconButton>
+                </TooltipIconButton> */}
               </div>
 
               <div className="from-background to-background/0 absolute inset-x-0 top-full h-5 bg-gradient-to-b" />
@@ -540,7 +541,8 @@ export function Thread() {
                             : "Type your message..."
                         }
                         className="field-sizing-content resize-none border-none bg-transparent p-3.5 pb-0 shadow-none ring-0 outline-none focus:ring-0 focus:outline-none"
-                        disabled={!!stream.interrupt}
+                        // disabled={!!stream.interrupt}
+                        disabled={stream.isLoading}
                       />
 
                       <div className="flex items-center justify-between p-2 pt-4">
@@ -559,23 +561,41 @@ export function Thread() {
                             </Label>
                           </div>
                         </div>
-                        {stream.isLoading ? (
-                          <Button
-                            key="stop"
-                            onClick={() => stream.stop()}
-                          >
-                            <LoaderCircle className="h-4 w-4 animate-spin" />
-                            Cancel
-                          </Button>
-                        ) : (
-                          <Button
-                            type="submit"
-                            className="shadow-md transition-all"
-                            disabled={isLoading || !input.trim()}
-                          >
-                            Send
-                          </Button>
-                        )}
+                        <div className="flex items-center space-x-1">
+                          <div className="">
+                            <TooltipIconButton
+                              tooltip="Reset"
+                              type="button"
+                              disabled={
+                                stream.isLoading || stream.messages.length === 0
+                              }
+                              variant="ghost"
+                              className="bg-muted rounded-md border px-5 py-5 shadow-xs"
+                              onClick={() => setThreadId(null)}
+                            >
+                              <RefreshCcw className="size-5" />
+                              {/* Reset */}
+                            </TooltipIconButton>
+                          </div>
+
+                          {stream.isLoading ? (
+                            <Button
+                              key="stop"
+                              onClick={() => stream.stop()}
+                            >
+                              <LoaderCircle className="h-4 w-4 animate-spin" />
+                              Cancel
+                            </Button>
+                          ) : (
+                            <Button
+                              type="submit"
+                              className="ml-3 shadow-md transition-all"
+                              disabled={isLoading || !input.trim()}
+                            >
+                              Send
+                            </Button>
+                          )}
+                        </div>
                       </div>
                     </form>
                     {/*  to handle inbetween response  */}
