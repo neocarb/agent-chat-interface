@@ -481,6 +481,7 @@ export function Thread() {
                             <TooltipIconButton
                               tooltip="Reset"
                               type="button"
+                              disabled={stream.isLoading || !stream}
                               variant="ghost"
                               className="bg-muted rounded-md border px-5 py-5 shadow-xs"
                               onClick={() => setThreadId(null)}
