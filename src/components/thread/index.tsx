@@ -127,6 +127,7 @@ export function Thread() {
   const isLargeScreen = useMediaQuery("(min-width: 1024px)");
 
   const stream = useStreamContext();
+  console.log("stream", stream);
   const messages = stream.messages;
   const isLoading = stream.isLoading;
 
@@ -151,7 +152,6 @@ export function Thread() {
         // Message has already been logged. do not modify ref, return early.
         return;
       }
-
       // Message is defined, and it has not been logged yet. Save it, and send the error
       lastError.current = message;
       toast.error("An error occurred. Please try again.", {
@@ -457,7 +457,8 @@ export function Thread() {
                             : "Type your message..."
                         }
                         className="field-sizing-content resize-none border-none bg-transparent p-3.5 pb-0 shadow-none ring-0 outline-none focus:ring-0 focus:outline-none"
-                        disabled={!!stream.interrupt}
+                        // disabled={!!stream.interrupt}
+                        disabled={stream.isLoading}
                       />
 
                       <div className="flex items-center justify-between p-2 pt-4">
