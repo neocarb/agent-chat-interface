@@ -152,7 +152,6 @@ export function Thread() {
         // Message has already been logged. do not modify ref, return early.
         return;
       }
-
       // Message is defined, and it has not been logged yet. Save it, and send the error
       lastError.current = message;
       toast.error("An error occurred. Please try again.", {
@@ -290,6 +289,7 @@ export function Thread() {
         >
           {!chatStarted && (
             <div className="absolute top-0 left-0 z-10 flex w-full items-center justify-between gap-3 p-2 pl-4">
+              {/* removed form UI  */}
               {/* <div>
                 {(!chatHistoryOpen || !isLargeScreen) && (
                   <Button
@@ -354,15 +354,6 @@ export function Thread() {
                 {/* <div className="flex items-center">
                   <OpenGitHubRepo />
                 </div> */}
-                {/* <TooltipIconButton
-                  size="lg"
-                  className="p-4"
-                  tooltip="New thread"
-                  variant="ghost"
-                  onClick={() => setThreadId(null)}
-                >
-                  <SquarePen className="size-5" />
-                </TooltipIconButton> */}
               </div>
 
               <div className="from-background to-background/0 absolute inset-x-0 top-full h-5 bg-gradient-to-b" />
@@ -453,12 +444,14 @@ export function Thread() {
                           }
                         }}
                         placeholder={
-                          stream.interrupt
-                            ? "Enter your respone to the assistant in the text box above..."
-                            : "Type your message..."
+                          stream.messages.length === 0
+                            ? "Type your message..."
+                            : stream.interrupt
+                              ? "Type your message..."
+                              : "Please wait for the response..."
                         }
                         className="field-sizing-content resize-none border-none bg-transparent p-3.5 pb-0 shadow-none ring-0 outline-none focus:ring-0 focus:outline-none"
-                        disabled={!!stream.interrupt}
+                        disabled={stream.isLoading}
                       />
 
                       <div className="flex items-center justify-between p-2 pt-4">
@@ -490,7 +483,6 @@ export function Thread() {
                               onClick={() => setThreadId(null)}
                             >
                               <RefreshCcw className="size-5" />
-                              {/* Reset */}
                             </TooltipIconButton>
                           </div>
 

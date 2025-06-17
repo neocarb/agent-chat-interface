@@ -120,7 +120,9 @@ function ResponseComponent({
       </div>
 
       {showArgsInResponse && (
-        <ArgsRenderer args={interruptValue.action_request.args} />
+        <>
+          <ArgsRenderer args={interruptValue.action_request.args} />
+        </>
       )}
 
       <div className="flex w-full flex-col items-start gap-[6px]">

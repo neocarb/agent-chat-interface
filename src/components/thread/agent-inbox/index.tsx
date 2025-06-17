@@ -35,23 +35,26 @@ export function ThreadView({ interrupt }: ThreadViewProps) {
     }
   };
 
-  return (
-    <div className="flex h-[80vh] w-full flex-col overflow-y-scroll rounded-2xl bg-gray-50/50 p-8 lg:flex-row [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-300 [&::-webkit-scrollbar-track]:bg-transparent">
-      {showSidePanel ? (
-        <StateView
-          handleShowSidePanel={handleShowSidePanel}
-          description={interruptObj.description}
-          values={thread.values}
-          view={showState ? "state" : "description"}
-        />
-      ) : (
-        <ThreadActionsView
-          interrupt={interruptObj}
-          handleShowSidePanel={handleShowSidePanel}
-          showState={showState}
-          showDescription={showDescription}
-        />
-      )}
-    </div>
+  return ( null
+    // <div className="flex h-[80vh] w-full flex-col overflow-y-scroll rounded-2xl bg-gray-50/50 p-8 lg:flex-row [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-300 [&::-webkit-scrollbar-track]:bg-transparent">
+    //   {showSidePanel ? (
+    //     <StateView
+    //       handleShowSidePanel={handleShowSidePanel}
+    //       description={interruptObj.description}
+    //       values={thread.values}
+    //       view={showState ? "state" : "description"}
+    //     />
+    //   ) : (
+    //     <>
+    //       <p>Inside thread/index.tsx</p>
+    //       <ThreadActionsView
+    //         interrupt={interruptObj}
+    //         handleShowSidePanel={handleShowSidePanel}
+    //         showState={showState}
+    //         showDescription={showDescription}
+    //       />
+    //     </>
+    //   )}
+    // </div>
   );
 }
