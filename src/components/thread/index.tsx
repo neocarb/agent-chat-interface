@@ -9,8 +9,6 @@ import { Button } from "../ui/button";
 import { Checkpoint, Message } from "@langchain/langgraph-sdk";
 import { AssistantMessage, AssistantMessageLoading } from "./messages/ai";
 import { HumanMessage } from "./messages/human";
-import { Textarea } from "@/components/ui/textarea";
-import { HumanResponseWithEdits, SubmitType } from "./agent-inbox/types";
 import {
   DO_NOT_RENDER_ID_PREFIX,
   ensureToolCallsHaveResponses,
@@ -129,7 +127,6 @@ export function Thread() {
   const isLargeScreen = useMediaQuery("(min-width: 1024px)");
 
   const stream = useStreamContext();
-  // console.log("stream", stream);
   const messages = stream.messages;
   const isLoading = stream.isLoading;
 
