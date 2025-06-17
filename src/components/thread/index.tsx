@@ -236,88 +236,6 @@ export function Thread() {
     (m) => m.type === "ai" || m.type === "tool",
   );
 
-  // for Textarea component
-
-  const [humanResponse, setHumanResponse] = useState<HumanResponseWithEdits[]>([
-    {
-      type: "response",
-      args: "",
-      acceptAllowed: true,
-      editsMade: false,
-    },
-  ]);
-
-  const [hasAddedResponse, setHasAddedResponse] = useState(false);
-  const [selectedSubmitType, setSelectedSubmitType] =
-    useState<SubmitType>("response");
-
-  const hasEdited =
-    humanResponse.find((r) => r.type === "response")?.editsMade ?? false;
-
-  type SubmitType = "edit" | "accept" | "response";
-
-  const onResponseChange = (
-    change: string,
-    response: HumanResponseWithEdits,
-  ) => {
-    if (!change) {
-      setHasAddedResponse(false);
-      if (hasEdited) {
-        // The user has deleted their response, so we should set the submit type to
-        // `edit` if they've edited, or `accept` if it's allowed and they have not edited.
-        setSelectedSubmitType("edit");
-      } else if (response.acceptAllowed) {
-        setSelectedSubmitType("accept");
-      }
-    } else {
-      setSelectedSubmitType("response");
-      setHasAddedResponse(true);
-    }
-
-    setHumanResponse((prev) => {
-      const newResponse: HumanResponseWithEdits = {
-        type: response.type,
-        args: change,
-      };
-
-      if (prev.find((p) => p.type === response.type)) {
-        return prev.map((p) => {
-          if (p.type === response.type) {
-            if (p.acceptAllowed) {
-              return {
-                ...newResponse,
-                acceptAllowed: true,
-                editsMade: !!change,
-              };
-            }
-            return newResponse;
-          }
-          return p;
-        });
-      } else {
-        throw new Error("No human response found for string response");
-      }
-    });
-  };
-
-  const res = humanResponse.find((r) => r.type === "response");
-  if (!res || typeof res.args !== "string") {
-    return null;
-  }
-  const handleSubmit2 = async (
-    e: React.MouseEvent<HTMLButtonElement, MouseEvent> | React.KeyboardEvent,
-  ) => {
-    e.preventDefault();
-    console.log("Submitting", humanResponse);
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
-      e.preventDefault();
-      handleSubmit2(e);
-    }
-  };
-
   return (
     <div className="flex h-screen w-full overflow-hidden">
       <div className="relative hidden lg:flex">
@@ -437,15 +355,6 @@ export function Thread() {
                 {/* <div className="flex items-center">
                   <OpenGitHubRepo />
                 </div> */}
-                {/* <TooltipIconButton
-                  size="lg"
-                  className="p-4"
-                  tooltip="New thread"
-                  variant="ghost"
-                  onClick={() => setThreadId(null)}
-                >
-                  <SquarePen className="size-5" />
-                </TooltipIconButton> */}
               </div>
 
               <div className="from-background to-background/0 absolute inset-x-0 top-full h-5 bg-gradient-to-b" />
@@ -543,7 +452,6 @@ export function Thread() {
                               : "Please wait for the response..."
                         }
                         className="field-sizing-content resize-none border-none bg-transparent p-3.5 pb-0 shadow-none ring-0 outline-none focus:ring-0 focus:outline-none"
-                        // disabled={!!stream.interrupt}
                         disabled={stream.isLoading}
                       />
 
@@ -576,7 +484,6 @@ export function Thread() {
                               onClick={() => setThreadId(null)}
                             >
                               <RefreshCcw className="size-5" />
-                              {/* Reset */}
                             </TooltipIconButton>
                           </div>
 
@@ -600,24 +507,6 @@ export function Thread() {
                         </div>
                       </div>
                     </form>
-                    {/*  to handle inbetween response  */}
-                    {/* <div>
-                      <Textarea
-                        disabled={false}
-                        value={res.args}
-                        onChange={(e) => onResponseChange(e.target.value, res)}
-                        onKeyDown={handleKeyDown}
-                        rows={4}
-                        placeholder="Your response here..."
-                      />
-                      <Button
-                        variant="brand"
-                        disabled={false}
-                        onClick={handleSubmit2}
-                      >
-                        Send Response
-                      </Button>
-                    </div> */}
                   </div>
                 </div>
               }
