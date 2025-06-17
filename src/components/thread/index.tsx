@@ -9,6 +9,8 @@ import { Button } from "../ui/button";
 import { Checkpoint, Message } from "@langchain/langgraph-sdk";
 import { AssistantMessage, AssistantMessageLoading } from "./messages/ai";
 import { HumanMessage } from "./messages/human";
+import backgroundImg from "../../assets/a11.webp";
+import Heading from "../thread/agent-inbox/components/heading";
 import {
   DO_NOT_RENDER_ID_PREFIX,
   ensureToolCallsHaveResponses,
@@ -134,7 +136,6 @@ export function Thread() {
 
   const setThreadId = (id: string | null) => {
     _setThreadId(id);
-
     // close artifact and reset artifact context
     closeArtifact();
     setArtifactContext({});
@@ -234,7 +235,15 @@ export function Thread() {
   );
 
   return (
-    <div className="flex h-screen w-full overflow-hidden">
+    <div
+      className="flex h-screen w-full overflow-hidden"
+      style={{
+        backgroundImage: `url(${backgroundImg.src})`,
+        backgroundSize: "cover",
+        // backgroundPosition: "right",
+        backgroundRepeat: "no-repeat",
+      }}
+    >
       <div className="relative hidden lg:flex">
         <motion.div
           className="absolute z-20 h-full overflow-hidden border-r bg-white"
@@ -310,7 +319,7 @@ export function Thread() {
             </div>
           )}
           {chatStarted && (
-            <div className="relative z-10 flex items-center justify-between gap-3 p-2">
+            <div className="relative z-10 flex items-center justify-between gap-3 bg-white p-2">
               <div className="relative flex items-center justify-start gap-2">
                 {/* <div className="absolute left-0 z-10">
                   {(!chatHistoryOpen || !isLargeScreen) && (
@@ -355,7 +364,7 @@ export function Thread() {
                 </div> */}
               </div>
 
-              <div className="from-background to-background/0 absolute inset-x-0 top-full h-5 bg-gradient-to-b" />
+              <div className="from-background to-background/0 absolute inset-x-0 top-full h-1 bg-gradient-to-b" />
             </div>
           )}
 
@@ -369,6 +378,17 @@ export function Thread() {
               contentClassName="pt-8 pb-16  max-w-3xl mx-auto flex flex-col gap-4 w-full"
               content={
                 <>
+                  {/* List of functional pills  */}
+                  {!chatStarted && (
+                    <div className="flex justify-between">
+                      <button
+                        onClick={handleSubmit}
+                        className="rounded-2xl border-2 border-dashed border-white px-2 py-1 text-white hover:border-solid"
+                      >
+                        Book Flight
+                      </button>
+                    </div>
+                  )}
                   {messages
                     .filter((m) => !m.id?.startsWith(DO_NOT_RENDER_ID_PREFIX))
                     .map((message, index) =>
@@ -403,20 +423,11 @@ export function Thread() {
                 </>
               }
               footer={
-                <div className="sticky bottom-0 flex flex-col items-center gap-8 bg-white">
+                <div className="sticky bottom-0 flex flex-col items-center gap-8">
                   {!chatStarted && (
-                    <div className="flex flex-col items-center gap-2">
-                      {/* <LangGraphLogoSVG className="h-8 flex-shrink-0" /> */}
-                      <h1 className="text-2xl font-semibold tracking-tight">
-                        Flight Booking Agent
-                      </h1>
-                      <p className="max-w-md text-center text-sm text-gray-500">
-                        This agent can help you book flights in 4 super easy
-                        steps: search flights, select flight, enter your details
-                        and make payment. <br />
-                        Try "Hi, I want to book a flight" to get started!
-                      </p>
-                    </div>
+                    <>
+                      <Heading />
+                    </>
                   )}
 
                   <ScrollToBottom className="animate-in fade-in-0 zoom-in-95 absolute bottom-full left-1/2 mb-4 -translate-x-1/2" />
