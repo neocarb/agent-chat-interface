@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from "uuid";
 import { ReactNode, useEffect, useRef } from "react";
-import { RefreshCcw } from "lucide-react";
+import { RefreshCcw, Plane } from "lucide-react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { useStreamContext } from "@/providers/Stream";
@@ -9,8 +9,14 @@ import { Button } from "../ui/button";
 import { Checkpoint, Message } from "@langchain/langgraph-sdk";
 import { AssistantMessage, AssistantMessageLoading } from "./messages/ai";
 import { HumanMessage } from "./messages/human";
-import backgroundImg from "../../assets/a11.webp";
-import Heading from "../thread/agent-inbox/components/heading";
+import { MarkdownText } from "./markdown-text";
+import Heading, {
+  agentIconMap,
+  agentBackgroundMap,
+} from "../thread/agent-inbox/components/heading";
+import { headHeading } from "../thread/agent-inbox/components/heading";
+import { promptButtons } from "../thread/agent-inbox/components/heading";
+
 import {
   DO_NOT_RENDER_ID_PREFIX,
   ensureToolCallsHaveResponses,
@@ -124,7 +130,7 @@ export function Thread() {
     "hideToolCalls",
     parseAsBoolean.withDefault(true),
   );
-  const [input, setInput] = useState("Hi, I want to book a flight");
+  const [input, setInput] = useState("");
   const [firstTokenReceived, setFirstTokenReceived] = useState(false);
   const isLargeScreen = useMediaQuery("(min-width: 1024px)");
 
@@ -182,15 +188,20 @@ export function Thread() {
     prevMessageLength.current = messages.length;
   }, [messages]);
 
-  const handleSubmit = (e: FormEvent) => {
-    e.preventDefault();
-    if (!input.trim() || isLoading) return;
+  // Dynamically generated info
+  const agentType = process.env.NEXT_PUBLIC_ASSISTANT_ID;
+  const Icon = agentIconMap[agentType ?? ""] || Plane;
+  const bgImage = agentBackgroundMap[agentType ?? "flight_booking_agent"]?.src;
+
+  // to handle submit message
+  const submitMessage = (message: string) => {
+    if (!message.trim() || isLoading) return;
     setFirstTokenReceived(false);
 
     const newHumanMessage: Message = {
       id: uuidv4(),
       type: "human",
-      content: input,
+      content: message,
     };
 
     const toolMessages = ensureToolCallsHaveResponses(stream.messages);
@@ -217,6 +228,48 @@ export function Thread() {
     setInput("");
   };
 
+  const handleSubmit = (e: FormEvent) => {
+    e.preventDefault();
+    submitMessage(input);
+  };
+
+  // To handle yes and No Feat
+  const isConfirmationPrompt = (messages: Message[]) => {
+    const confirmationRegex =
+      /would you like me to|shall I go ahead|would you like to proceed|should I proceed|can I go ahead|shall I proceed|Please confirm |confirm|is this okay/i;
+
+    // Find the latest AI message
+    const lastAIMessage = [...messages]
+      .reverse()
+      .find((msg) => msg.type === "ai" && typeof msg.content === "string");
+
+    // Only test if content is a string
+    return typeof lastAIMessage?.content === "string"
+      ? confirmationRegex.test(lastAIMessage.content)
+      : false;
+  };
+
+  type MessageConfirmationProps = {
+    submitMessage: (response: string) => void;
+  };
+
+  const MessageConfirmation = ({ submitMessage }: MessageConfirmationProps) => (
+    <div className="mt-4 flex justify-end gap-4">
+      <button
+        onClick={() => submitMessage("Yes")}
+        className="rounded bg-gray-300 px-4 py-2 text-white shadow-md hover:bg-gray-700"
+      >
+        Yes
+      </button>
+      <button
+        onClick={() => submitMessage("No")}
+        className="rounded bg-gray-300 px-4 py-2 text-white shadow-md hover:bg-gray-700"
+      >
+        No
+      </button>
+    </div>
+  );
+
   const handleRegenerate = (
     parentCheckpoint: Checkpoint | null | undefined,
   ) => {
@@ -238,9 +291,9 @@ export function Thread() {
     <div
       className="flex h-screen w-full overflow-hidden"
       style={{
-        backgroundImage: `url(${backgroundImg.src})`,
+        backgroundImage: `url(${bgImage})`,
         backgroundSize: "cover",
-        // backgroundPosition: "right",
+        backgroundPosition: "right",
         backgroundRepeat: "no-repeat",
       }}
     >
@@ -295,10 +348,9 @@ export function Thread() {
               : { duration: 0 }
           }
         >
-          {!chatStarted && (
+          {/* {!chatStarted && (
             <div className="absolute top-0 left-0 z-10 flex w-full items-center justify-between gap-3 p-2 pl-4">
-              {/* removed form UI  */}
-              {/* <div>
+              <div>
                 {(!chatHistoryOpen || !isLargeScreen) && (
                   <Button
                     className="hover:bg-gray-100"
@@ -312,12 +364,12 @@ export function Thread() {
                     )}
                   </Button>
                 )}
-              </div> */}
-              {/* <div className="absolute top-2 right-4 flex items-center">
+              </div>
+              <div className="absolute top-2 right-4 flex items-center">
                 <OpenGitHubRepo />
-              </div> */}
+              </div>
             </div>
-          )}
+          )} */}
           {chatStarted && (
             <div className="relative z-10 flex items-center justify-between gap-3 bg-white p-2">
               <div className="relative flex items-center justify-start gap-2">
@@ -340,7 +392,7 @@ export function Thread() {
                   className="flex cursor-pointer items-center gap-2"
                   onClick={() => setThreadId(null)}
                   animate={{
-                    marginLeft: !chatHistoryOpen ? 48 : 0,
+                    marginLeft: !chatHistoryOpen ? 33 : 0,
                   }}
                   transition={{
                     type: "spring",
@@ -352,9 +404,12 @@ export function Thread() {
                     width={32}
                     height={32}
                   /> */}
-                  <span className="text-xl font-semibold tracking-tight">
-                    Flight Booking Agent
-                  </span>
+                  <>
+                    <Icon />
+                    <span className="text-xl font-semibold tracking-tight">
+                      {headHeading}
+                    </span>
+                  </>
                 </motion.button>
               </div>
 
@@ -380,13 +435,21 @@ export function Thread() {
                 <>
                   {/* List of functional pills  */}
                   {!chatStarted && (
-                    <div className="flex justify-between">
-                      <button
-                        onClick={handleSubmit}
-                        className="rounded-2xl border-2 border-dashed border-white px-2 py-1 text-white hover:border-solid"
-                      >
-                        Book Flight
-                      </button>
+                    <div className="flex justify-between gap-3">
+                      <div className="flex justify-between gap-3">
+                        {promptButtons.map(({ label, prompt }) => (
+                          <button
+                            key={label}
+                            onClick={() => {
+                              setInput(prompt);
+                              submitMessage(prompt);
+                            }}
+                            className="hover:bg-muted flex rounded-2xl border-2 border-dashed border-white px-2 py-1 font-semibold hover:border-solid"
+                          >
+                            {label}
+                          </button>
+                        ))}
+                      </div>
                     </div>
                   )}
                   {messages
@@ -399,16 +462,24 @@ export function Thread() {
                           isLoading={isLoading}
                         />
                       ) : (
-                        <AssistantMessage
-                          key={message.id || `${message.type}-${index}`}
-                          message={message}
-                          isLoading={isLoading}
-                          handleRegenerate={handleRegenerate}
-                        />
+                        <>
+                          <AssistantMessage
+                            key={message.id || `${message.type}-${index}`}
+                            message={message}
+                            isLoading={isLoading}
+                            handleRegenerate={handleRegenerate}
+                          />
+                          {isConfirmationPrompt(messages) && (
+                            <MessageConfirmation
+                              submitMessage={submitMessage}
+                            />
+                          )}
+                        </>
                       ),
                     )}
                   {/* Special rendering case where there are no AI/tool messages, but there is an interrupt.
                     We need to render it outside of the messages list, since there are no messages to render */}
+                  {}
                   {hasNoAIOrToolMessages && !!stream.interrupt && (
                     <AssistantMessage
                       key="interrupt-msg"
