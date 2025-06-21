@@ -374,10 +374,9 @@ export function Thread() {
             </div>
           )} */}
 
-          
           {chatStarted && (
             <div className="relative z-10 flex items-center justify-between gap-3 bg-white p-2">
-              <div className="relative flex items-center justify-start gap-2">/
+              <div className="relative flex items-center justify-start gap-2">
                 {/* <div className="absolute left-0 z-10">
                   {(!chatHistoryOpen || !isLargeScreen) && (
                     <Button
