@@ -89,7 +89,7 @@ function StateViewRecursive(props: StateViewRecursiveProps) {
   }
 
   if (props.value == null) {
-    return <p className="font-light whitespace-pre-wrap text-gray-600">null</p>;
+    return <p className="font-light whitespace-pre-wrap text-gray-600">Value not present</p>;
   }
 
   if (Array.isArray(props.value)) {
