@@ -1,4 +1,5 @@
 import { v4 as uuidv4 } from "uuid";
+import React from "react";
 import { ReactNode, useEffect, useRef } from "react";
 import { RefreshCcw, Plane } from "lucide-react";
 import { motion } from "framer-motion";
@@ -51,7 +52,6 @@ import {
   ArtifactTitle,
   useArtifactContext,
 } from "./artifact";
-
 
 function StickyToBottomContent(props: {
   content: ReactNode;
@@ -138,6 +138,8 @@ export function Thread() {
   const stream = useStreamContext();
   const messages = stream.messages;
   const isLoading = stream.isLoading;
+
+  console.log("messages", messages);
 
   const lastError = useRef<string | undefined>(undefined);
 
@@ -237,7 +239,7 @@ export function Thread() {
   // To handle yes and No Feat
   const isConfirmationPrompt = (messages: Message[]) => {
     const confirmationRegex =
-      /would you like me to|shall I go ahead|would you like to proceed|should I proceed|can I go ahead|shall I proceed|Please confirm |confirm|is this okay/i;
+      /want me to proceed|like me to proceed|can I go ahead|shall I proceed|Please confirm |confirm |is this okay/i;
 
     // Find the latest AI message
     const lastAIMessage = [...messages]
@@ -258,13 +260,13 @@ export function Thread() {
     <div className="mt-4 flex justify-end gap-4">
       <button
         onClick={() => submitMessage("Yes")}
-        className="rounded bg-gray-300 px-4 py-2 text-white shadow-md hover:bg-gray-700"
+        className="rounded bg-gray-400 px-4 py-2 text-white shadow-md hover:bg-gray-500"
       >
         Yes
       </button>
       <button
         onClick={() => submitMessage("No")}
-        className="rounded bg-gray-300 px-4 py-2 text-white shadow-md hover:bg-gray-700"
+        className="rounded bg-gray-400 px-4 py-2 text-white shadow-md hover:bg-gray-500"
       >
         No
       </button>
@@ -290,13 +292,15 @@ export function Thread() {
 
   return (
     <div
-      className="flex h-screen w-full overflow-hidden"
-      style={{
-        backgroundImage: `url(${bgImage})`,
-        backgroundSize: "cover",
-        backgroundPosition: "right",
-        backgroundRepeat: "no-repeat",
-      }}
+      className="flex min-h-screen w-full overflow-hidden bg-gradient-to-br from-[#dceefb] via-[#bcdff5] to-[#a3d8f4]"
+      // className="flex min-h-screen w-full overflow-hidden bg-gradient-to-br from-sky-100 via-sky-200 to-sky-300"
+
+      // className="flex min-h-screen w-full overflow-hidden bg-gradient-to-br from-[#e0f7fa] via-[#b3e5fc] to-[#81d4fa]"
+
+      // className="flex h-screen w-full overflow-hidden bg-no-repeat bg-cover bg-right sm:bg-center"
+      // style={{
+      //   backgroundImage: `url(${bgImage})`,
+      // }}
     >
       <div className="relative hidden lg:flex">
         <motion.div
@@ -349,49 +353,9 @@ export function Thread() {
               : { duration: 0 }
           }
         >
-          {/* {!chatStarted && (
-            <div className="absolute top-0 left-0 z-10 flex w-full items-center justify-between gap-3 p-2 pl-4">
-              <div>
-              {/* removed form UI  */}
-              {/* <div>
-                {(!chatHistoryOpen || !isLargeScreen) && (
-                  <Button
-                    className="hover:bg-gray-100"
-                    variant="ghost"
-                    onClick={() => setChatHistoryOpen((p) => !p)}
-                  >
-                    {chatHistoryOpen ? (
-                      <PanelRightOpen className="size-5" />
-                    ) : (
-                      <PanelRightClose className="size-5" />
-                    )}
-                  </Button>
-                )}
-              </div>
-              <div className="absolute top-2 right-4 flex items-center">
-                <OpenGitHubRepo />
-              </div>
-            </div>
-          )} */}
-
           {chatStarted && (
-            <div className="relative z-10 flex items-center justify-between gap-3 bg-white p-2">
+            <div className="bg-muted relative z-1 flex items-center justify-between gap-3 p-2">
               <div className="relative flex items-center justify-start gap-2">
-                {/* <div className="absolute left-0 z-10">
-                  {(!chatHistoryOpen || !isLargeScreen) && (
-                    <Button
-                      className="hover:bg-gray-100"
-                      variant="ghost"
-                      onClick={() => setChatHistoryOpen((p) => !p)}
-                    >
-                      {chatHistoryOpen ? (
-                        <PanelRightOpen className="size-5" />
-                      ) : (
-                        <PanelRightClose className="size-5" />
-                      )}
-                    </Button>
-                  )}
-                </div> */}
                 <motion.button
                   className="flex cursor-pointer items-center gap-2"
                   onClick={() => setThreadId(null)}
@@ -404,10 +368,6 @@ export function Thread() {
                     damping: 30,
                   }}
                 >
-                  {/* <LangGraphLogoSVG
-                    width={32}
-                    height={32}
-                  /> */}
                   <>
                     <Icon />
                     <span className="text-xl font-semibold tracking-tight">
@@ -415,12 +375,6 @@ export function Thread() {
                     </span>
                   </>
                 </motion.button>
-              </div>
-
-              <div className="flex items-center gap-4">
-                {/* <div className="flex items-center">
-                  <OpenGitHubRepo />
-                </div> */}
               </div>
 
               <div className="from-background to-background/0 absolute inset-x-0 top-full h-1 bg-gradient-to-b" />
@@ -434,53 +388,56 @@ export function Thread() {
                 !chatStarted && "mt-[25vh] flex flex-col items-stretch",
                 chatStarted && "grid grid-rows-[1fr_auto]",
               )}
-              contentClassName="pt-8 pb-16  max-w-3xl mx-auto flex flex-col gap-4 w-full"
+              contentClassName="pt-8 pb-8  max-w-3xl mx-auto flex flex-col gap-4 w-full"
               content={
                 <>
                   {/* List of functional pills  */}
                   {!chatStarted && (
-                    <div className="flex justify-between gap-3">
-                      <div className="flex justify-between gap-3">
-                        {promptButtons.map(({ label, prompt }) => (
-                          <button
-                            key={label}
-                            onClick={() => {
-                              setInput(prompt);
-                              submitMessage(prompt);
-                            }}
-                            className="hover:bg-muted flex rounded-2xl border-2 border-dashed border-white px-2 py-1 font-semibold hover:border-solid"
-                          >
-                            {label}
-                          </button>
-                        ))}
-                      </div>
+                    <div className="flex flex-col justify-between gap-3 sm:flex-row">
+                      {promptButtons.map(({ label, prompt }) => (
+                        <button
+                          key={label}
+                          onClick={() => {
+                            setInput(prompt);
+                            submitMessage(prompt);
+                          }}
+                          className="bg-muted flex items-center justify-center rounded-2xl border-2 border-white px-2 py-1 text-center font-semibold transition-all hover:border-solid hover:border-gray-300"
+                        >
+                          {label}
+                        </button>
+                      ))}
                     </div>
                   )}
+
                   {messages
                     .filter((m) => !m.id?.startsWith(DO_NOT_RENDER_ID_PREFIX))
-                    .map((message, index) =>
-                      message.type === "human" ? (
+                    .map((message, index) => {
+                      const isLast = index === messages.length - 1;
+
+                      return message.type === "human" ? (
                         <HumanMessage
                           key={message.id || `${message.type}-${index}`}
                           message={message}
                           isLoading={isLoading}
                         />
                       ) : (
-                        <>
+                        <React.Fragment
+                          key={message.id || `${message.type}-${index}`}
+                        >
                           <AssistantMessage
-                            key={message.id || `${message.type}-${index}`}
                             message={message}
                             isLoading={isLoading}
                             handleRegenerate={handleRegenerate}
                           />
-                          {isConfirmationPrompt(messages) && (
+                          {isConfirmationPrompt(messages) && isLast && (
                             <MessageConfirmation
                               submitMessage={submitMessage}
                             />
                           )}
-                        </>
-                      ),
-                    )}
+                        </React.Fragment>
+                      );
+                    })}
+
                   {/* Special rendering case where there are no AI/tool messages, but there is an interrupt.
                     We need to render it outside of the messages list, since there are no messages to render */}
                   {}
