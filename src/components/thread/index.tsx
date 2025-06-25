@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from "uuid";
 import React from "react";
 import { ReactNode, useEffect, useRef } from "react";
-import { Bot, RefreshCcw } from "lucide-react";
+import { RefreshCcw, Bot } from "lucide-react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { useStreamContext } from "@/providers/Stream";
@@ -243,7 +243,7 @@ export function Thread() {
   );
 
   return (
-    <div className="flex min-h-screen w-full overflow-hidden bg-gradient-to-br from-[#dceefb] via-[#bcdff5] to-[#a3d8f4]">
+    <div className="flex min-h-screen w-full overflow-hidden bg-gradient-to-br from-sky-100 via-sky-100 to-sky-100">
       <div className="relative hidden lg:flex">
         <motion.div
           className="absolute z-20 h-full overflow-hidden border-r bg-white"
@@ -335,7 +335,7 @@ export function Thread() {
                 <>
                   {/* List of functional pills  */}
                   {!chatStarted && (
-                    <div className="flex flex-col justify-between gap-3 sm:flex-row">
+                    <div className="z-10 flex flex-col justify-between gap-3 sm:flex-row">
                       {promptButtons.map(({ label, prompt }) => (
                         <button
                           key={label}

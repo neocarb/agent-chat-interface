@@ -1,4 +1,5 @@
 import { Plane } from "lucide-react";
+import type { StaticImageData } from "next/image";
 
 // Heading
 export let headHeading: string = "";
@@ -55,7 +56,7 @@ function Heading() {
   }
 
   return (
-    <div className="flex flex-col items-center gap-2">
+    <div className="flex flex-col items-center gap-2 my-5">
       <h1 className="text-3xl font-semibold tracking-tight">{title}</h1>
       <p className="text max-w-lg text-center whitespace-pre-line text-gray-900">
         {description}
