@@ -1,6 +1,4 @@
 import { Plane } from "lucide-react";
-import type { StaticImageData } from "next/image";
-import FlightBG from "../../../../assets/a13.jpg";
 
 // Heading
 export let headHeading: string = "";
@@ -11,11 +9,6 @@ export let promptButtons: { label: string; prompt: string }[] = [];
 // Icon map
 export const agentIconMap: Record<string, React.ElementType> = {
   flight_booking_agent: Plane,
-};
-
-// Background map
-export const agentBackgroundMap: Record<string, StaticImageData> = {
-  flight_booking_agent: FlightBG,
 };
 
 function Heading() {

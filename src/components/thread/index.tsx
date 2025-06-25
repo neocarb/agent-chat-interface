@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from "uuid";
 import React from "react";
 import { ReactNode, useEffect, useRef } from "react";
-import { RefreshCcw, Plane } from "lucide-react";
+import { Bot, RefreshCcw } from "lucide-react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { useStreamContext } from "@/providers/Stream";
@@ -13,7 +13,6 @@ import { HumanMessage } from "./messages/human";
 import { MarkdownText } from "./markdown-text";
 import Heading, {
   agentIconMap,
-  agentBackgroundMap,
 } from "../thread/agent-inbox/components/heading";
 import { headHeading } from "../thread/agent-inbox/components/heading";
 import { promptButtons } from "../thread/agent-inbox/components/heading";
@@ -24,14 +23,7 @@ import {
 } from "@/lib/ensure-tool-responses";
 import { LangGraphLogoSVG } from "../icons/langgraph";
 import { TooltipIconButton } from "./tooltip-icon-button";
-import {
-  ArrowDown,
-  LoaderCircle,
-  PanelRightOpen,
-  PanelRightClose,
-  SquarePen,
-  XIcon,
-} from "lucide-react";
+import { ArrowDown, LoaderCircle, XIcon } from "lucide-react";
 import { useQueryState, parseAsBoolean } from "nuqs";
 import { StickToBottom, useStickToBottomContext } from "use-stick-to-bottom";
 import ThreadHistory from "./history";
@@ -191,8 +183,7 @@ export function Thread() {
 
   // Dynamically generated info
   const agentType = process.env.NEXT_PUBLIC_ASSISTANT_ID;
-  const Icon = agentIconMap[agentType ?? ""] || Plane;
-  const bgImage = agentBackgroundMap[agentType ?? "flight_booking_agent"]?.src;
+  const Icon = agentIconMap[agentType ?? ""] || Bot;
 
   // to handle submit message
   const submitMessage = (message: string) => {
@@ -234,43 +225,6 @@ export function Thread() {
     submitMessage(input);
   };
 
-  // To handle yes and No Feat
-  const isConfirmationPrompt = (messages: Message[]) => {
-    const confirmationRegex =
-      /want me to proceed|like me to proceed|can I go ahead|shall I proceed|Please confirm |confirm |is this okay/i;
-
-    // Find the latest AI message
-    const lastAIMessage = [...messages]
-      .reverse()
-      .find((msg) => msg.type === "ai" && typeof msg.content === "string");
-
-    // Only test if content is a string
-    return typeof lastAIMessage?.content === "string"
-      ? confirmationRegex.test(lastAIMessage.content)
-      : false;
-  };
-
-  type MessageConfirmationProps = {
-    submitMessage: (response: string) => void;
-  };
-
-  const MessageConfirmation = ({ submitMessage }: MessageConfirmationProps) => (
-    <div className="mt-4 flex justify-end gap-4">
-      <button
-        onClick={() => submitMessage("Yes")}
-        className="rounded bg-gray-400 px-4 py-2 text-white shadow-md hover:bg-gray-500"
-      >
-        Yes
-      </button>
-      <button
-        onClick={() => submitMessage("No")}
-        className="rounded bg-gray-400 px-4 py-2 text-white shadow-md hover:bg-gray-500"
-      >
-        No
-      </button>
-    </div>
-  );
-
   const handleRegenerate = (
     parentCheckpoint: Checkpoint | null | undefined,
   ) => {
@@ -289,17 +243,7 @@ export function Thread() {
   );
 
   return (
-    <div
-      className="flex min-h-screen w-full overflow-hidden bg-gradient-to-br from-[#dceefb] via-[#bcdff5] to-[#a3d8f4]"
-      // className="flex min-h-screen w-full overflow-hidden bg-gradient-to-br from-sky-100 via-sky-200 to-sky-300"
-
-      // className="flex min-h-screen w-full overflow-hidden bg-gradient-to-br from-[#e0f7fa] via-[#b3e5fc] to-[#81d4fa]"
-
-      // className="flex h-screen w-full overflow-hidden bg-no-repeat bg-cover bg-right sm:bg-center"
-      // style={{
-      //   backgroundImage: `url(${bgImage})`,
-      // }}
-    >
+    <div className="flex min-h-screen w-full overflow-hidden bg-gradient-to-br from-[#dceefb] via-[#bcdff5] to-[#a3d8f4]">
       <div className="relative hidden lg:flex">
         <motion.div
           className="absolute z-20 h-full overflow-hidden border-r bg-white"
@@ -409,33 +353,22 @@ export function Thread() {
 
                   {messages
                     .filter((m) => !m.id?.startsWith(DO_NOT_RENDER_ID_PREFIX))
-                    .map((message, index) => {
-                      const isLast = index === messages.length - 1;
-
-                      return message.type === "human" ? (
+                    .map((message, index) =>
+                      message.type === "human" ? (
                         <HumanMessage
                           key={message.id || `${message.type}-${index}`}
                           message={message}
                           isLoading={isLoading}
                         />
                       ) : (
-                        <React.Fragment
+                        <AssistantMessage
                           key={message.id || `${message.type}-${index}`}
-                        >
-                          <AssistantMessage
-                            message={message}
-                            isLoading={isLoading}
-                            handleRegenerate={handleRegenerate}
-                          />
-                          {isConfirmationPrompt(messages) && isLast && (
-                            <MessageConfirmation
-                              submitMessage={submitMessage}
-                            />
-                          )}
-                        </React.Fragment>
-                      );
-                    })}
-
+                          message={message}
+                          isLoading={isLoading}
+                          handleRegenerate={handleRegenerate}
+                        />
+                      ),
+                    )}
                   {/* Special rendering case where there are no AI/tool messages, but there is an interrupt.
                     We need to render it outside of the messages list, since there are no messages to render */}
                   {}
