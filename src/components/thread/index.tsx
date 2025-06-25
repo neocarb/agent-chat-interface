@@ -1,6 +1,7 @@
 import { v4 as uuidv4 } from "uuid";
+import React from "react";
 import { ReactNode, useEffect, useRef } from "react";
-import { RefreshCcw } from "lucide-react";
+import { Bot, RefreshCcw } from "lucide-react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { useStreamContext } from "@/providers/Stream";
@@ -9,20 +10,20 @@ import { Button } from "../ui/button";
 import { Checkpoint, Message } from "@langchain/langgraph-sdk";
 import { AssistantMessage, AssistantMessageLoading } from "./messages/ai";
 import { HumanMessage } from "./messages/human";
+import { MarkdownText } from "./markdown-text";
+import Heading, {
+  agentIconMap,
+} from "../thread/agent-inbox/components/heading";
+import { headHeading } from "../thread/agent-inbox/components/heading";
+import { promptButtons } from "../thread/agent-inbox/components/heading";
+
 import {
   DO_NOT_RENDER_ID_PREFIX,
   ensureToolCallsHaveResponses,
 } from "@/lib/ensure-tool-responses";
 import { LangGraphLogoSVG } from "../icons/langgraph";
 import { TooltipIconButton } from "./tooltip-icon-button";
-import {
-  ArrowDown,
-  LoaderCircle,
-  PanelRightOpen,
-  PanelRightClose,
-  SquarePen,
-  XIcon,
-} from "lucide-react";
+import { ArrowDown, LoaderCircle, XIcon } from "lucide-react";
 import { useQueryState, parseAsBoolean } from "nuqs";
 import { StickToBottom, useStickToBottomContext } from "use-stick-to-bottom";
 import ThreadHistory from "./history";
@@ -43,7 +44,6 @@ import {
   ArtifactTitle,
   useArtifactContext,
 } from "./artifact";
-
 
 function StickyToBottomContent(props: {
   content: ReactNode;
@@ -123,7 +123,7 @@ export function Thread() {
     "hideToolCalls",
     parseAsBoolean.withDefault(true),
   );
-  const [input, setInput] = useState("Hi, I want to book a flight");
+  const [input, setInput] = useState("");
   const [firstTokenReceived, setFirstTokenReceived] = useState(false);
   const isLargeScreen = useMediaQuery("(min-width: 1024px)");
 
@@ -135,7 +135,6 @@ export function Thread() {
 
   const setThreadId = (id: string | null) => {
     _setThreadId(id);
-
     // close artifact and reset artifact context
     closeArtifact();
     setArtifactContext({});
@@ -182,15 +181,19 @@ export function Thread() {
     prevMessageLength.current = messages.length;
   }, [messages]);
 
-  const handleSubmit = (e: FormEvent) => {
-    e.preventDefault();
-    if (!input.trim() || isLoading) return;
+  // Dynamically generated info
+  const agentType = process.env.NEXT_PUBLIC_ASSISTANT_ID;
+  const Icon = agentIconMap[agentType ?? ""] || Bot;
+
+  // to handle submit message
+  const submitMessage = (message: string) => {
+    if (!message.trim() || isLoading) return;
     setFirstTokenReceived(false);
 
     const newHumanMessage: Message = {
       id: uuidv4(),
       type: "human",
-      content: input,
+      content: message,
     };
 
     const toolMessages = ensureToolCallsHaveResponses(stream.messages);
@@ -217,6 +220,11 @@ export function Thread() {
     setInput("");
   };
 
+  const handleSubmit = (e: FormEvent) => {
+    e.preventDefault();
+    submitMessage(input);
+  };
+
   const handleRegenerate = (
     parentCheckpoint: Checkpoint | null | undefined,
   ) => {
@@ -235,7 +243,7 @@ export function Thread() {
   );
 
   return (
-    <div className="flex h-screen w-full overflow-hidden">
+    <div className="flex min-h-screen w-full overflow-hidden bg-gradient-to-br from-[#dceefb] via-[#bcdff5] to-[#a3d8f4]">
       <div className="relative hidden lg:flex">
         <motion.div
           className="absolute z-20 h-full overflow-hidden border-r bg-white"
@@ -287,52 +295,14 @@ export function Thread() {
               : { duration: 0 }
           }
         >
-          {!chatStarted && (
-            <div className="absolute top-0 left-0 z-10 flex w-full items-center justify-between gap-3 p-2 pl-4">
-              {/* removed form UI  */}
-              {/* <div>
-                {(!chatHistoryOpen || !isLargeScreen) && (
-                  <Button
-                    className="hover:bg-gray-100"
-                    variant="ghost"
-                    onClick={() => setChatHistoryOpen((p) => !p)}
-                  >
-                    {chatHistoryOpen ? (
-                      <PanelRightOpen className="size-5" />
-                    ) : (
-                      <PanelRightClose className="size-5" />
-                    )}
-                  </Button>
-                )}
-              </div> */}
-              {/* <div className="absolute top-2 right-4 flex items-center">
-                <OpenGitHubRepo />
-              </div> */}
-            </div>
-          )}
           {chatStarted && (
-            <div className="relative z-10 flex items-center justify-between gap-3 p-2">
+            <div className="bg-muted relative z-1 flex items-center justify-between gap-3 p-2">
               <div className="relative flex items-center justify-start gap-2">
-                {/* <div className="absolute left-0 z-10">
-                  {(!chatHistoryOpen || !isLargeScreen) && (
-                    <Button
-                      className="hover:bg-gray-100"
-                      variant="ghost"
-                      onClick={() => setChatHistoryOpen((p) => !p)}
-                    >
-                      {chatHistoryOpen ? (
-                        <PanelRightOpen className="size-5" />
-                      ) : (
-                        <PanelRightClose className="size-5" />
-                      )}
-                    </Button>
-                  )}
-                </div> */}
                 <motion.button
                   className="flex cursor-pointer items-center gap-2"
                   onClick={() => setThreadId(null)}
                   animate={{
-                    marginLeft: !chatHistoryOpen ? 48 : 0,
+                    marginLeft: !chatHistoryOpen ? 33 : 0,
                   }}
                   transition={{
                     type: "spring",
@@ -340,23 +310,16 @@ export function Thread() {
                     damping: 30,
                   }}
                 >
-                  {/* <LangGraphLogoSVG
-                    width={32}
-                    height={32}
-                  /> */}
-                  <span className="text-xl font-semibold tracking-tight">
-                    Flight Booking Agent
-                  </span>
+                  <>
+                    <Icon />
+                    <span className="text-xl font-semibold tracking-tight">
+                      {headHeading}
+                    </span>
+                  </>
                 </motion.button>
               </div>
 
-              <div className="flex items-center gap-4">
-                {/* <div className="flex items-center">
-                  <OpenGitHubRepo />
-                </div> */}
-              </div>
-
-              <div className="from-background to-background/0 absolute inset-x-0 top-full h-5 bg-gradient-to-b" />
+              <div className="from-background to-background/0 absolute inset-x-0 top-full h-1 bg-gradient-to-b" />
             </div>
           )}
 
@@ -367,9 +330,27 @@ export function Thread() {
                 !chatStarted && "mt-[25vh] flex flex-col items-stretch",
                 chatStarted && "grid grid-rows-[1fr_auto]",
               )}
-              contentClassName="pt-8 pb-16  max-w-3xl mx-auto flex flex-col gap-4 w-full"
+              contentClassName="pt-8 pb-8  max-w-3xl mx-auto flex flex-col gap-4 w-full"
               content={
                 <>
+                  {/* List of functional pills  */}
+                  {!chatStarted && (
+                    <div className="flex flex-col justify-between gap-3 sm:flex-row">
+                      {promptButtons.map(({ label, prompt }) => (
+                        <button
+                          key={label}
+                          onClick={() => {
+                            setInput(prompt);
+                            submitMessage(prompt);
+                          }}
+                          className="bg-muted flex items-center justify-center rounded-2xl border-2 border-white px-2 py-1 text-center font-semibold transition-all hover:border-solid hover:border-gray-300"
+                        >
+                          {label}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+
                   {messages
                     .filter((m) => !m.id?.startsWith(DO_NOT_RENDER_ID_PREFIX))
                     .map((message, index) =>
@@ -390,6 +371,7 @@ export function Thread() {
                     )}
                   {/* Special rendering case where there are no AI/tool messages, but there is an interrupt.
                     We need to render it outside of the messages list, since there are no messages to render */}
+
                   {hasNoAIOrToolMessages && !!stream.interrupt && (
                     <AssistantMessage
                       key="interrupt-msg"
@@ -404,20 +386,11 @@ export function Thread() {
                 </>
               }
               footer={
-                <div className="sticky bottom-0 flex flex-col items-center gap-8 bg-white">
+                <div className="sticky bottom-0 flex flex-col items-center gap-8">
                   {!chatStarted && (
-                    <div className="flex flex-col items-center gap-2">
-                      {/* <LangGraphLogoSVG className="h-8 flex-shrink-0" /> */}
-                      <h1 className="text-2xl font-semibold tracking-tight">
-                        Flight Booking Agent
-                      </h1>
-                      <p className="max-w-md text-center text-sm text-gray-500">
-                        This agent can help you book flights in 4 super easy
-                        steps: search flights, select flight, enter your details
-                        and make payment. <br />
-                        Try "Hi, I want to book a flight" to get started!
-                      </p>
-                    </div>
+                    <>
+                      <Heading />
+                    </>
                   )}
 
                   <ScrollToBottom className="animate-in fade-in-0 zoom-in-95 absolute bottom-full left-1/2 mb-4 -translate-x-1/2" />

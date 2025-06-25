@@ -40,9 +40,11 @@ export function ThreadIdCopyable({
 
   const handleCopy = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     e.stopPropagation();
-    navigator.clipboard.writeText(threadId);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    if (threadId) {
+      navigator.clipboard.writeText(threadId);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
   };
 
   return (
