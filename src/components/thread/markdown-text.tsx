@@ -243,36 +243,7 @@ const defaultComponents: any = {
   },
 };
 
-const isConfirmationPrompt = (text: string) => {
-  return /would you like me to|Shall I go ahead|Would you like to proceed|should I proceed|can I go ahead|Shall I proceed|is this okay/i.test(
-    text,
-  );
-};
-
-const MessageConformation = () => {
-  const [userMesage, setUserMessage] = useState("");
-
-  return (
-    <div className="mt-4 flex justify-end gap-4">
-      <button
-        onClick={() => setUserMessage("Yes")}
-        className="rounded bg-gray-300 px-4 py-2 text-white shadow-md hover:bg-gray-700"
-      >
-        Yes
-      </button>
-      <button
-        onClick={() => setUserMessage("No")}
-        className="rounded bg-gray-300 px-4 py-2 text-white shadow-md hover:bg-gray-700"
-      >
-        No
-      </button>
-    </div>
-  );
-};
-
 const MarkdownTextImpl: FC<{ children: string }> = ({ children }) => {
-  // const confirmationPrompt = isConfirmationPrompt(children);
-
   return (
     <div
       className="markdown-content rounded-md p-4"
@@ -285,8 +256,6 @@ const MarkdownTextImpl: FC<{ children: string }> = ({ children }) => {
       >
         {children}
       </ReactMarkdown>
-
-      {/* {confirmationPrompt && <MessageConformation />} */}
     </div>
   );
 };

@@ -139,8 +139,6 @@ export function Thread() {
   const messages = stream.messages;
   const isLoading = stream.isLoading;
 
-  console.log("messages", messages);
-
   const lastError = useRef<string | undefined>(undefined);
 
   const setThreadId = (id: string | null) => {
