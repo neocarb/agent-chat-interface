@@ -11,6 +11,7 @@ import { Checkpoint, Message } from "@langchain/langgraph-sdk";
 import { AssistantMessage, AssistantMessageLoading } from "./messages/ai";
 import { HumanMessage } from "./messages/human";
 import { MarkdownText } from "./markdown-text";
+import { FlightOffersCard } from "./agent-inbox/components/FlightOffersCard";
 import Heading, {
   agentIconMap,
 } from "../thread/agent-inbox/components/heading";
@@ -128,7 +129,9 @@ export function Thread() {
   const isLargeScreen = useMediaQuery("(min-width: 1024px)");
 
   const stream = useStreamContext();
+  console.log("Stream", stream);
   const messages = stream.messages;
+  // console.log("messages", messages);
   const isLoading = stream.isLoading;
 
   const lastError = useRef<string | undefined>(undefined);
@@ -224,6 +227,52 @@ export function Thread() {
     e.preventDefault();
     submitMessage(input);
   };
+
+  //  type for flight offer card
+  type Offer = {
+    offerId: string;
+    totalCost: string;
+    currency: string;
+    origin: string;
+    destination: string;
+    airlineName: string;
+    departureTime: string;
+    arrivalTime: string;
+    duration: string;
+    cabinClass: string;
+  };
+
+  type Props = {
+    offers: Offer[];
+  };
+
+  // demo data for testing
+  const demoOffers: Offer[] = [
+    {
+      offerId: "off_0000AvLgtviqojC4IalWX3",
+      totalCost: "779.30",
+      currency: "USD",
+      origin: "Indira Gandhi International Airport",
+      destination: "Veer Savarkar International Airport",
+      airlineName: "Air India",
+      departureTime: "2025-07-26T05:25:00",
+      arrivalTime: "2025-07-26T10:15:00",
+      duration: "4 hours and 50 minutes",
+      cabinClass: "business",
+    },
+    {
+      offerId: "off_0000AvLgtvr0KPiQhsa2FO",
+      totalCost: "740.10",
+      currency: "USD",
+      origin: "Indira Gandhi International Airport",
+      destination: "Veer Savarkar International Airport",
+      airlineName: "Air India",
+      departureTime: "2025-07-26T05:25:00",
+      arrivalTime: "2025-07-26T10:15:00",
+      duration: "4 hours and 50 minutes",
+      cabinClass: "business",
+    },
+  ];
 
   const handleRegenerate = (
     parentCheckpoint: Checkpoint | null | undefined,
@@ -361,12 +410,15 @@ export function Thread() {
                           isLoading={isLoading}
                         />
                       ) : (
-                        <AssistantMessage
-                          key={message.id || `${message.type}-${index}`}
-                          message={message}
-                          isLoading={isLoading}
-                          handleRegenerate={handleRegenerate}
-                        />
+                        <>
+                          <AssistantMessage
+                            key={message.id || `${message.type}-${index}`}
+                            message={message}
+                            isLoading={isLoading}
+                            handleRegenerate={handleRegenerate}
+                          />
+                          <FlightOffersCard offers={demoOffers} />
+                        </>
                       ),
                     )}
                   {/* Special rendering case where there are no AI/tool messages, but there is an interrupt.
