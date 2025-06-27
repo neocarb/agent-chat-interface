@@ -11,16 +11,20 @@ type Offer = {
   arrivalTime: string;
   duration: string;
   cabinClass: string;
-  routeCode?: string;
-  stops?: string;
 };
 
 type Props = {
   offers: Offer[];
+  onSelectOffer: (id: string) => void;
 };
 
-export const FlightOffersCard: React.FC<Props> = ({ offers }) => {
-  const [offerId, setOfferId] = useState("");
+export const FlightOffersCard: React.FC<Props> = ({
+  offers,
+  onSelectOffer,
+}) => {
+  const [expandedCards, setExpandedCards] = useState<Record<number, boolean>>(
+    {},
+  );
 
   const formatTime = (time: string) =>
     new Date(time).toLocaleTimeString([], {
@@ -35,79 +39,116 @@ export const FlightOffersCard: React.FC<Props> = ({ offers }) => {
       day: "numeric",
     });
 
+  const groupOffers = () => {
+    const groups: Record<string, Offer[]> = {};
+    for (const offer of offers) {
+      const key = `${offer.airlineName}-${offer.departureTime}-${offer.arrivalTime}`;
+      if (!groups[key]) groups[key] = [];
+      groups[key].push(offer);
+    }
+    return Object.values(groups);
+  };
+
+  const groupedOffers = groupOffers();
+  console.log("groupedOffers", groupedOffers);
   return (
-    <div className="flex gap-3">
-      {offers.map((offer) => (
-        <div
-          key={offer.offerId}
-          className="relative mx-auto w-full max-w-md overflow-hidden rounded-xl border border-gray-300 bg-white shadow-md"
-        >
-          {/* Header */}
-          <div className="flex items-center justify-between px-4 py-3">
-            <div className="flex items-center gap-2">
-              <div className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-700 text-sm text-white">
-                ✈️
+    <div className="flex flex-wrap gap-3">
+      {groupedOffers.map((flightOffers, index) => {
+        const base = flightOffers[0];
+        const isExpanded = expandedCards[index] ?? false;
+        const visibleOffers = isExpanded ? flightOffers : [flightOffers[0]];
+
+        return (
+          <div
+            key={index}
+            className="relative basis-[calc(50%-0.375rem)] overflow-hidden rounded-xl border border-gray-300 bg-white shadow-md"
+          >
+            {/* Header */}
+            <div className="flex items-center justify-between px-4 py-3">
+              <div className="flex items-center gap-2">
+                <div className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-700 text-sm text-white">
+                  ✈️
+                </div>
+                <span className="text-sm font-semibold text-gray-800">
+                  {base.airlineName}
+                </span>
               </div>
-              <span className="text-sm font-semibold text-gray-800">
-                {offer.airlineName}
-              </span>
-            </div>
-            <div className="text-lg font-bold text-green-700">
-              {offer.currency} {offer.totalCost}
-            </div>
-          </div>
-
-          {/* Body */}
-          <div className="grid grid-cols-3 items-center gap-3 px-4 py-4 text-sm text-gray-800">
-            {/* Departure */}
-            <div>
-              <p className="text-gray-600">{offer.origin}</p>
-              <p className="text-xl font-semibold">
-                {formatTime(offer.departureTime)}
-              </p>
-              <p className="text-xs text-gray-500">
-                {formatDate(offer.departureTime)}
-              </p>
+              <div className="text-xs font-semibold text-gray-500">
+                {formatDate(base.departureTime)}
+              </div>
             </div>
 
-            {/* Flight path */}
-            <div className="flex flex-col items-center justify-center">
-              <div className="flex items-center space-x-2 text-xs text-gray-600">
-                {/* <hr className="w-6 border border-dashed" /> */}
+            {/* Body */}
+            <div className="grid grid-cols-3 items-center gap-3 px-4 py-4 text-sm text-gray-800">
+              {/* Departure */}
+              <div>
+                <p className="text-gray-600">{base.origin}</p>
+                <p className="text-xl font-semibold">
+                  {formatTime(base.departureTime)}
+                </p>
+              </div>
+
+              {/* Flight path */}
+              <div className="flex flex-col items-center justify-center">
                 <span className="text-xl">✈️</span>
-                {/* <hr className="w-6 border border-dashed" /> */}
+                <p className="mt-1 text-center text-xs text-blue-600">
+                  {base.duration}
+                </p>
               </div>
-              <p className="mt-1 text-center text-xs text-blue-600">
-                {offer.duration}
-              </p>
-              <p className="text-center text-[11px] text-gray-500">
-                {offer.origin.split(" ")[0]} – {offer.destination.split(" ")[0]}
-              </p>
+
+              {/* Arrival */}
+              <div className="text-right">
+                <p className="text-gray-600">{base.destination}</p>
+                <p className="text-xl font-semibold">
+                  {formatTime(base.arrivalTime)}
+                </p>
+              </div>
             </div>
 
-            {/* Arrival */}
-            <div className="text-right">
-              <p className="text-gray-600">{offer.destination}</p>
-              <p className="text-xl font-semibold">
-                {formatTime(offer.arrivalTime)}
-              </p>
-              <p className="text-xs text-gray-500">
-                {formatDate(offer.arrivalTime)}
-              </p>
+            {/* Cabin Class Options */}
+            <div className="space-y-1 border-t px-4 py-2">
+              {visibleOffers.map((offer) => (
+                <div
+                  key={offer.offerId}
+                  className="flex items-center justify-between text-sm"
+                >
+                  <span className="capitalize">
+                    {offer.cabinClass.replace("_", " ")}
+                  </span>
+                  <div className="flex items-center gap-3">
+                    <span className="font-semibold text-green-700">
+                      {offer.currency} {offer.totalCost}
+                    </span>
+                    <button
+                      onClick={() => onSelectOffer(offer.offerId)}
+                      className="rounded-md bg-blue-500 px-3 py-1 text-xs font-medium text-white hover:bg-blue-700"
+                    >
+                      Book
+                    </button>
+                  </div>
+                </div>
+              ))}
             </div>
-          </div>
 
-          {/* CTA */}
-          <div className="flex justify-end border-t px-4 py-2">
-            <button
-              onClick={() => setOfferId(offer.offerId)}
-              className="rounded-lg bg-blue-600 px-4 py-1 text-sm font-medium text-white hover:bg-blue-700"
-            >
-              Book Now
-            </button>
+            {/* Toggle Button */}
+            {flightOffers.length > 1 && (
+              <div className="px-4 pb-3">
+                <button
+                  onClick={() =>
+                    setExpandedCards((prev) => ({
+                      ...prev,
+                      [index]: !isExpanded,
+                    }))
+                  }
+                  className="text-xs text-blue-600 hover:underline"
+                >
+                  {isExpanded ? "Show less ▲" : "Show more options ▼"}
+                </button>
+              </div>
+            )}
           </div>
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
 };

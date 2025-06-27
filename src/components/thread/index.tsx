@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from "uuid";
 import React from "react";
 import { ReactNode, useEffect, useRef } from "react";
-import { RefreshCcw, Bot } from "lucide-react";
+import { Bot, RefreshCcw } from "lucide-react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { useStreamContext } from "@/providers/Stream";
@@ -10,12 +10,10 @@ import { Button } from "../ui/button";
 import { Checkpoint, Message } from "@langchain/langgraph-sdk";
 import { AssistantMessage, AssistantMessageLoading } from "./messages/ai";
 import { HumanMessage } from "./messages/human";
-import { MarkdownText } from "./markdown-text";
-import { FlightOffersCard } from "./agent-inbox/components/FlightOffersCard";
 import Heading, {
   agentIconMap,
 } from "../thread/agent-inbox/components/heading";
-import { headHeading } from "../thread/agent-inbox/components/heading";
+import { getHeadHeading } from "../thread/agent-inbox/components/heading";
 import { promptButtons } from "../thread/agent-inbox/components/heading";
 
 import {
@@ -125,13 +123,16 @@ export function Thread() {
     parseAsBoolean.withDefault(true),
   );
   const [input, setInput] = useState("");
+  // for  offer Id
+  const [selectedOfferId, setSelectedOfferId] = useState("");
+
   const [firstTokenReceived, setFirstTokenReceived] = useState(false);
   const isLargeScreen = useMediaQuery("(min-width: 1024px)");
 
   const stream = useStreamContext();
-  console.log("Stream", stream);
+  // console.log("Stream", stream);
   const messages = stream.messages;
-  // console.log("messages", messages);
+  console.log("messages", messages);
   const isLoading = stream.isLoading;
 
   const lastError = useRef<string | undefined>(undefined);
@@ -228,51 +229,12 @@ export function Thread() {
     submitMessage(input);
   };
 
-  //  type for flight offer card
-  type Offer = {
-    offerId: string;
-    totalCost: string;
-    currency: string;
-    origin: string;
-    destination: string;
-    airlineName: string;
-    departureTime: string;
-    arrivalTime: string;
-    duration: string;
-    cabinClass: string;
-  };
-
-  type Props = {
-    offers: Offer[];
-  };
-
-  // demo data for testing
-  const demoOffers: Offer[] = [
-    {
-      offerId: "off_0000AvLgtviqojC4IalWX3",
-      totalCost: "779.30",
-      currency: "USD",
-      origin: "Indira Gandhi International Airport",
-      destination: "Veer Savarkar International Airport",
-      airlineName: "Air India",
-      departureTime: "2025-07-26T05:25:00",
-      arrivalTime: "2025-07-26T10:15:00",
-      duration: "4 hours and 50 minutes",
-      cabinClass: "business",
-    },
-    {
-      offerId: "off_0000AvLgtvr0KPiQhsa2FO",
-      totalCost: "740.10",
-      currency: "USD",
-      origin: "Indira Gandhi International Airport",
-      destination: "Veer Savarkar International Airport",
-      airlineName: "Air India",
-      departureTime: "2025-07-26T05:25:00",
-      arrivalTime: "2025-07-26T10:15:00",
-      duration: "4 hours and 50 minutes",
-      cabinClass: "business",
-    },
-  ];
+  // to run submit message only when offerID is present
+  useEffect(() => {
+    if (selectedOfferId) {
+      submitMessage(`Book flight with ID ${selectedOfferId}`);
+    }
+  }, [selectedOfferId]);
 
   const handleRegenerate = (
     parentCheckpoint: Checkpoint | null | undefined,
@@ -362,7 +324,7 @@ export function Thread() {
                   <>
                     <Icon />
                     <span className="text-xl font-semibold tracking-tight">
-                      {headHeading}
+                      {getHeadHeading()}
                     </span>
                   </>
                 </motion.button>
@@ -410,15 +372,13 @@ export function Thread() {
                           isLoading={isLoading}
                         />
                       ) : (
-                        <>
-                          <AssistantMessage
-                            key={message.id || `${message.type}-${index}`}
-                            message={message}
-                            isLoading={isLoading}
-                            handleRegenerate={handleRegenerate}
-                          />
-                          <FlightOffersCard offers={demoOffers} />
-                        </>
+                        <AssistantMessage
+                          key={message.id || `${message.type}-${index}`}
+                          message={message}
+                          isLoading={isLoading}
+                          handleRegenerate={handleRegenerate}
+                          onOfferSelect={setSelectedOfferId}
+                        />
                       ),
                     )}
                   {/* Special rendering case where there are no AI/tool messages, but there is an interrupt.
@@ -430,6 +390,7 @@ export function Thread() {
                       message={undefined}
                       isLoading={isLoading}
                       handleRegenerate={handleRegenerate}
+                      onOfferSelect={setSelectedOfferId}
                     />
                   )}
                   {isLoading && !firstTokenReceived && (

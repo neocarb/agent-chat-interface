@@ -124,6 +124,8 @@ const defaultComponents: any = {
         "text-primary font-medium underline underline-offset-4",
         className,
       )}
+      target="_blank"
+      rel="noopener noreferrer"
       {...props}
     />
   ),
@@ -154,7 +156,7 @@ const defaultComponents: any = {
   table: ({ className, ...props }: { className?: string }) => (
     <table
       className={cn(
-        "my-5 w-full border-separate border-spacing-0 overflow-y-auto",
+        "my-5 w-full border-separate border-spacing-0 overflow-y-auto bg-blue-100",
         className,
       )}
       {...props}
