@@ -10,9 +10,8 @@ import { Button } from "../ui/button";
 import { Checkpoint, Message } from "@langchain/langgraph-sdk";
 import { AssistantMessage, AssistantMessageLoading } from "./messages/ai";
 import { HumanMessage } from "./messages/human";
-import Heading, {
-  agentIconMap,
-} from "../thread/agent-inbox/components/heading";
+import { agentIconMap } from "../thread/agent-inbox/components/heading";
+import Heading from "../thread/agent-inbox/components/heading";
 import { getHeadHeading } from "../thread/agent-inbox/components/heading";
 import { promptButtons } from "../thread/agent-inbox/components/heading";
 
@@ -130,9 +129,7 @@ export function Thread() {
   const isLargeScreen = useMediaQuery("(min-width: 1024px)");
 
   const stream = useStreamContext();
-  // console.log("Stream", stream);
   const messages = stream.messages;
-  console.log("messages", messages);
   const isLoading = stream.isLoading;
 
   const lastError = useRef<string | undefined>(undefined);

@@ -1,5 +1,5 @@
 import { Plane } from "lucide-react";
-import type { StaticImageData } from "next/image";
+  import type { StaticImageData } from "next/image";
 
 // Heading
 export function getHeadHeading(): string {
@@ -67,7 +67,7 @@ function Heading() {
       <p className="text max-w-lg text-center whitespace-pre-line text-gray-900">
         {description}
       </p>
-    </div>
+    </div>  
   );
 }
 

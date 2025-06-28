@@ -50,7 +50,6 @@ export const FlightOffersCard: React.FC<Props> = ({
   };
 
   const groupedOffers = groupOffers();
-  console.log("groupedOffers", groupedOffers);
   return (
     <div className="flex flex-wrap gap-3">
       {groupedOffers.map((flightOffers, index) => {

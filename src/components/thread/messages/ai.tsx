@@ -143,7 +143,6 @@ export function AssistantMessage({
   if (isToolResult && hideToolCalls) {
     return null;
   }
-  console.log("message from AssistantMessage", message);
 
   const messageIndex = thread.messages.findIndex((m) => m.id === message?.id);
   const prevMessage = thread.messages[messageIndex - 1] as any;
