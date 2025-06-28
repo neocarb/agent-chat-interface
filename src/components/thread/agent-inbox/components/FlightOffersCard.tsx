@@ -51,24 +51,45 @@ export const FlightOffersCard: React.FC<Props> = ({
     return Object.values(groups);
   };
 
-  const labelEconomyOffersByPrice = (offers: Offer[]): OfferWithLabel[] => {
+  const labelAndOrderOffersByTier = (offers: Offer[]): OfferWithLabel[] => {
+    const tierOrder = [
+      "Economy Value",
+      "Economy Classic",
+      "Economy Flex",
+      "Premium Economy",
+      "Business",
+    ];
+
     const economy = offers.filter(
-      (o) => o.cabinClass.toLowerCase() === "economy",
+      (o) => o.cabinClass.toLowerCase() === "economy"
     );
 
     const sortedEconomy: OfferWithLabel[] = economy
       .sort((a, b) => parseFloat(a.totalCost) - parseFloat(b.totalCost))
       .map((offer, i) => ({
         ...offer,
-        tierLabel: ["Eco Value", "Eco Classic", "Eco Flex"][i] || "Economy",
+        tierLabel:
+          ["Economy Value", "Economy Classic", "Economy Flex"][i] || "Economy",
       }));
 
-    return offers.map((offer) => {
-      if (offer.cabinClass.toLowerCase() === "economy") {
+    const labeledOffers: OfferWithLabel[] = offers.map((offer) => {
+      const lowerCabin = offer.cabinClass.toLowerCase();
+      if (lowerCabin === "economy") {
         const match = sortedEconomy.find((o) => o.offerId === offer.offerId);
         return { ...offer, tierLabel: match?.tierLabel };
+      } else if (lowerCabin === "premium_economy") {
+        return { ...offer, tierLabel: "Premium Economy" };
+      } else if (lowerCabin === "business") {
+        return { ...offer, tierLabel: "Business" };
+      } else {
+        return { ...offer, tierLabel: offer.cabinClass };
       }
-      return offer;
+    });
+
+    return labeledOffers.sort((a, b) => {
+      const indexA = tierOrder.indexOf(a.tierLabel || "");
+      const indexB = tierOrder.indexOf(b.tierLabel || "");
+      return indexA - indexB;
     });
   };
 
@@ -79,7 +100,7 @@ export const FlightOffersCard: React.FC<Props> = ({
       {groupedOffers.map((flightOffers, index) => {
         const base = flightOffers[0];
         const isExpanded = expandedCards[index] ?? false;
-        const visibleOffers: OfferWithLabel[] = labelEconomyOffersByPrice(
+        const visibleOffers: OfferWithLabel[] = labelAndOrderOffersByTier(
           isExpanded ? flightOffers : [flightOffers[0]],
         );
 
@@ -132,31 +153,28 @@ export const FlightOffersCard: React.FC<Props> = ({
 
             {/* Cabin Class Options */}
             <div className="space-y-1 border-t px-4 py-2">
-              {visibleOffers.map((offer) => {
-                const labeledOffer = offer as OfferWithLabel;
-                return (
-                  <div
-                    key={labeledOffer.offerId}
-                    className="flex items-center justify-between text-sm"
-                  >
-                    <span className="capitalize">
-                      {labeledOffer.tierLabel ||
-                        labeledOffer.cabinClass.replace("_", " ")}
+              {visibleOffers.map((offer) => (
+                <div
+                  key={offer.offerId}
+                  className="flex items-center justify-between text-sm"
+                >
+                  <span className="capitalize">
+                    {offer.tierLabel ||
+                      offer.cabinClass.replace("_", " ")}
+                  </span>
+                  <div className="flex items-center gap-3">
+                    <span className="font-semibold text-green-700">
+                      {offer.currency} {offer.totalCost}
                     </span>
-                    <div className="flex items-center gap-3">
-                      <span className="font-semibold text-green-700">
-                        {labeledOffer.currency} {labeledOffer.totalCost}
-                      </span>
-                      <button
-                        onClick={() => onSelectOffer(labeledOffer.offerId)}
-                        className="rounded-md bg-blue-500 px-3 py-1 text-xs font-medium text-white hover:bg-blue-700"
-                      >
-                        Book
-                      </button>
-                    </div>
+                    <button
+                      onClick={() => onSelectOffer(offer.offerId)}
+                      className="rounded-md bg-blue-500 px-3 py-1 text-xs font-medium text-white hover:bg-blue-700"
+                    >
+                      Book
+                    </button>
                   </div>
-                );
-              })}
+                </div>
+              ))}
             </div>
 
             {/* Toggle Button */}
