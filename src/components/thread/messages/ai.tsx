@@ -114,6 +114,8 @@ export function AssistantMessage({
 
   const thread = useStreamContext();
 
+  console.log("thread ", thread);
+
   const isLastMessage =
     thread.messages[thread.messages.length - 1].id === message?.id;
   const hasNoAIOrToolMessages = !thread.messages.find(
@@ -164,12 +166,6 @@ export function AssistantMessage({
           </>
         ) : (
           <>
-            {/* {contentString.length > 0 && (
-              <div className="py-1">
-                <MarkdownText>{contentString}</MarkdownText>
-              </div>
-            )} */}
-
             {contentString.length > 0 && !shouldShowExtractedOffers && (
               <div className="py-1">
                 <MarkdownText>{contentString}</MarkdownText>
@@ -178,7 +174,16 @@ export function AssistantMessage({
 
             {shouldShowExtractedOffers && (
               <ExtractOfferFromMessages
-                offer={thread.messages}
+                offer={thread.messages
+                  .filter((msg) => msg.type === "tool")
+                  .map((msg) => ({
+                    name: typeof msg.name === "string" ? msg.name : "",
+                    type: msg.type,
+                    content:
+                      typeof msg.content === "string"
+                        ? msg.content
+                        : JSON.stringify(msg.content),
+                  }))}
                 onOfferSelect={onOfferSelect}
               />
             )}
