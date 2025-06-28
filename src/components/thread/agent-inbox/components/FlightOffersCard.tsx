@@ -13,6 +13,8 @@ type Offer = {
   cabinClass: string;
 };
 
+type OfferWithLabel = Offer & { tierLabel?: string };
+
 type Props = {
   offers: Offer[];
   onSelectOffer: (id: string) => void;
@@ -49,13 +51,37 @@ export const FlightOffersCard: React.FC<Props> = ({
     return Object.values(groups);
   };
 
+  const labelEconomyOffersByPrice = (offers: Offer[]): OfferWithLabel[] => {
+    const economy = offers.filter(
+      (o) => o.cabinClass.toLowerCase() === "economy",
+    );
+
+    const sortedEconomy: OfferWithLabel[] = economy
+      .sort((a, b) => parseFloat(a.totalCost) - parseFloat(b.totalCost))
+      .map((offer, i) => ({
+        ...offer,
+        tierLabel: ["Eco Value", "Eco Classic", "Eco Flex"][i] || "Economy",
+      }));
+
+    return offers.map((offer) => {
+      if (offer.cabinClass.toLowerCase() === "economy") {
+        const match = sortedEconomy.find((o) => o.offerId === offer.offerId);
+        return { ...offer, tierLabel: match?.tierLabel };
+      }
+      return offer;
+    });
+  };
+
   const groupedOffers = groupOffers();
+
   return (
     <div className="flex flex-wrap gap-3">
       {groupedOffers.map((flightOffers, index) => {
         const base = flightOffers[0];
         const isExpanded = expandedCards[index] ?? false;
-        const visibleOffers = isExpanded ? flightOffers : [flightOffers[0]];
+        const visibleOffers: OfferWithLabel[] = labelEconomyOffersByPrice(
+          isExpanded ? flightOffers : [flightOffers[0]],
+        );
 
         return (
           <div
@@ -106,27 +132,31 @@ export const FlightOffersCard: React.FC<Props> = ({
 
             {/* Cabin Class Options */}
             <div className="space-y-1 border-t px-4 py-2">
-              {visibleOffers.map((offer) => (
-                <div
-                  key={offer.offerId}
-                  className="flex items-center justify-between text-sm"
-                >
-                  <span className="capitalize">
-                    {offer.cabinClass.replace("_", " ")}
-                  </span>
-                  <div className="flex items-center gap-3">
-                    <span className="font-semibold text-green-700">
-                      {offer.currency} {offer.totalCost}
+              {visibleOffers.map((offer) => {
+                const labeledOffer = offer as OfferWithLabel;
+                return (
+                  <div
+                    key={labeledOffer.offerId}
+                    className="flex items-center justify-between text-sm"
+                  >
+                    <span className="capitalize">
+                      {labeledOffer.tierLabel ||
+                        labeledOffer.cabinClass.replace("_", " ")}
                     </span>
-                    <button
-                      onClick={() => onSelectOffer(offer.offerId)}
-                      className="rounded-md bg-blue-500 px-3 py-1 text-xs font-medium text-white hover:bg-blue-700"
-                    >
-                      Book
-                    </button>
+                    <div className="flex items-center gap-3">
+                      <span className="font-semibold text-green-700">
+                        {labeledOffer.currency} {labeledOffer.totalCost}
+                      </span>
+                      <button
+                        onClick={() => onSelectOffer(labeledOffer.offerId)}
+                        className="rounded-md bg-blue-500 px-3 py-1 text-xs font-medium text-white hover:bg-blue-700"
+                      >
+                        Book
+                      </button>
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
 
             {/* Toggle Button */}
