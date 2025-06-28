@@ -14,6 +14,7 @@ import { ThreadView } from "../agent-inbox";
 import { useQueryState, parseAsBoolean } from "nuqs";
 import { GenericInterruptView } from "./generic-interrupt";
 import { useArtifact } from "../artifact";
+import { ExtractOfferFromMessages } from "../agent-inbox/components/extractOffersFromMessage";
 
 function CustomComponent({
   message,
@@ -97,10 +98,12 @@ export function AssistantMessage({
   message,
   isLoading,
   handleRegenerate,
+  onOfferSelect,
 }: {
   message: Message | undefined;
   isLoading: boolean;
   handleRegenerate: (parentCheckpoint: Checkpoint | null | undefined) => void;
+  onOfferSelect: (id: string) => void;
 }) {
   const content = message?.content ?? [];
   const contentString = getContentString(content);
@@ -110,6 +113,7 @@ export function AssistantMessage({
   );
 
   const thread = useStreamContext();
+
   const isLastMessage =
     thread.messages[thread.messages.length - 1].id === message?.id;
   const hasNoAIOrToolMessages = !thread.messages.find(
@@ -140,6 +144,12 @@ export function AssistantMessage({
     return null;
   }
 
+  const messageIndex = thread.messages.findIndex((m) => m.id === message?.id);
+  const prevMessage = thread.messages[messageIndex - 1] as any;
+
+  const shouldShowExtractedOffers =
+    prevMessage?.type === "tool" && prevMessage?.name === "search_offers";
+
   return (
     <div className="group mr-auto flex items-start gap-2">
       <div className="flex flex-col gap-2">
@@ -154,10 +164,26 @@ export function AssistantMessage({
           </>
         ) : (
           <>
-            {contentString.length > 0 && (
+            {contentString.length > 0 && !shouldShowExtractedOffers && (
               <div className="py-1">
                 <MarkdownText>{contentString}</MarkdownText>
               </div>
+            )}
+
+            {shouldShowExtractedOffers && (
+              <ExtractOfferFromMessages
+                offer={thread.messages
+                  .filter((msg) => msg.type === "tool")
+                  .map((msg) => ({
+                    name: typeof msg.name === "string" ? msg.name : "",
+                    type: msg.type,
+                    content:
+                      typeof msg.content === "string"
+                        ? msg.content
+                        : JSON.stringify(msg.content),
+                  }))}
+                onOfferSelect={onOfferSelect}
+              />
             )}
 
             {!hideToolCalls && (

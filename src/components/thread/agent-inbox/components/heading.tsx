@@ -1,7 +1,16 @@
 import { Plane } from "lucide-react";
+  import type { StaticImageData } from "next/image";
 
 // Heading
-export let headHeading: string = "";
+export function getHeadHeading(): string {
+  const agentType = process.env.NEXT_PUBLIC_ASSISTANT_ID;
+
+  if (agentType === "flight_booking_agent") {
+    return "Flight Booking Agent";
+  }
+
+  return "Generic Assistant Agent";
+}
 
 // Prompts
 export let promptButtons: { label: string; prompt: string }[] = [];
@@ -21,7 +30,6 @@ function Heading() {
     title = "Flight Booking Agent";
     description =
       "Welcome aboard, traveler! Your next adventure begins here. Ready to book that perfect flight and explore the world your way?";
-    headHeading = "Flight Booking Agent";
     promptButtons = [
       {
         label: "Ready to Fly? Book Now!",
@@ -41,7 +49,6 @@ function Heading() {
     title = "Generic Assistant Agent";
     description =
       "Hello! I'm your AI assistant, here to help with a wide range of tasks. Just type your request and I'll assist you right away!";
-    headHeading = "Generic Assistant Agent";
     promptButtons = [
       {
         label: "What can you do?",
@@ -55,12 +62,12 @@ function Heading() {
   }
 
   return (
-    <div className="flex flex-col items-center gap-2">
+    <div className="my-5 flex flex-col items-center gap-2">
       <h1 className="text-3xl font-semibold tracking-tight">{title}</h1>
       <p className="text max-w-lg text-center whitespace-pre-line text-gray-900">
         {description}
       </p>
-    </div>
+    </div>  
   );
 }
 

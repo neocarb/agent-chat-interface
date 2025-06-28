@@ -46,17 +46,33 @@ function MessagesRenderer({ messages }: { messages: BaseMessage[] }) {
     <div className="flex w-full flex-col gap-1">
       {messages.map((msg, idx) => {
         const messageTypeLabel = messageTypeToLabel(msg);
+
+        // SKIP showing content for search_offers tool messages
+        const isSearchOffersTool =
+          "type" in msg &&
+          msg.type === "tool" &&
+          "name" in msg &&
+          msg.name === "search_offers";
+
+        if (isSearchOffersTool) {
+          return null; // Skip rendering this message block completely
+        }
+
         const content =
           typeof msg.content === "string"
             ? msg.content
             : JSON.stringify(msg.content, null);
+
         return (
           <div
             key={msg.id ?? `message-${idx}`}
             className="ml-2 flex w-full flex-col gap-[2px]"
           >
             <p className="font-medium text-gray-700">{messageTypeLabel}:</p>
+
+            {/* his will now skip if it's a search_offers tool */}
             {content && <MarkdownText>{content}</MarkdownText>}
+
             {"tool_calls" in msg && msg.tool_calls ? (
               <div className="flex w-full flex-col items-start gap-1">
                 {(msg.tool_calls as ToolCall[]).map((tc, idx) => (
@@ -89,7 +105,11 @@ function StateViewRecursive(props: StateViewRecursiveProps) {
   }
 
   if (props.value == null) {
-    return <p className="font-light whitespace-pre-wrap text-gray-600">Value not present</p>;
+    return (
+      <p className="font-light whitespace-pre-wrap text-gray-600">
+        Value not present
+      </p>
+    );
   }
 
   if (Array.isArray(props.value)) {
