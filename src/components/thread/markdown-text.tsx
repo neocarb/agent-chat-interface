@@ -156,7 +156,7 @@ const defaultComponents: any = {
   table: ({ className, ...props }: { className?: string }) => (
     <table
       className={cn(
-        "my-5 w-full border-separate border-spacing-0 overflow-y-auto bg-blue-100",
+        "my-5 w-full border-separate border-spacing-0 overflow-y-auto",
         className,
       )}
       {...props}
