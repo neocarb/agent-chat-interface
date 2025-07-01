@@ -1,5 +1,4 @@
 import { Plane } from "lucide-react";
-import type { StaticImageData } from "next/image";
 
 // Heading
 export function getHeadHeading(): string {

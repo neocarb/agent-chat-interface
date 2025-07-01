@@ -148,7 +148,7 @@ export function AssistantMessage({
   if (message) {
     currentIndex = thread.messages.indexOf(message);
   } else {
-    null;
+    currentIndex = undefined;
   }
 
   const threadMessages = thread.messages;
