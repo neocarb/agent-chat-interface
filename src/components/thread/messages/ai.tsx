@@ -14,6 +14,7 @@ import { ThreadView } from "../agent-inbox";
 import { useQueryState, parseAsBoolean } from "nuqs";
 import { GenericInterruptView } from "./generic-interrupt";
 import { useArtifact } from "../artifact";
+import { ExtractOfferFromMessages } from "../agent-inbox/components/ExtractOfferFromMessages ";
 
 function CustomComponent({
   message,
@@ -97,10 +98,12 @@ export function AssistantMessage({
   message,
   isLoading,
   handleRegenerate,
+  onOfferSelect,
 }: {
   message: Message | undefined;
   isLoading: boolean;
   handleRegenerate: (parentCheckpoint: Checkpoint | null | undefined) => void;
+  onOfferSelect: (id: string) => void;
 }) {
   const content = message?.content ?? [];
   const contentString = getContentString(content);
@@ -139,6 +142,23 @@ export function AssistantMessage({
   if (isToolResult && hideToolCalls) {
     return null;
   }
+
+  let currentIndex: number | undefined;
+
+  if (message) {
+    currentIndex = thread.messages.indexOf(message);
+  } else {
+    null;
+  }
+
+  const threadMessages = thread.messages;
+
+  const triggerIndex = [...threadMessages].findLastIndex((msg) =>
+    msg.id?.includes("do-not-render-search-offers-run"),
+  );
+
+  const shouldShowExtractedOffers =
+    triggerIndex !== -1 && currentIndex === triggerIndex - 2;
 
   return (
     <div className="group mr-auto flex items-start gap-2">
@@ -180,6 +200,14 @@ export function AssistantMessage({
                 thread={thread}
               />
             )}
+
+            {shouldShowExtractedOffers && (
+              <ExtractOfferFromMessages
+                messages={[thread.messages[triggerIndex]]}
+                onOfferSelect={onOfferSelect}
+              />
+            )}
+
             <Interrupt
               interruptValue={threadInterrupt?.value}
               isLastMessage={isLastMessage}
