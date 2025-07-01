@@ -14,7 +14,7 @@ import { MarkdownText } from "./markdown-text";
 import Heading, {
   agentIconMap,
 } from "../thread/agent-inbox/components/heading";
-import { headHeading } from "../thread/agent-inbox/components/heading";
+import { getHeadHeading } from "../thread/agent-inbox/components/heading";
 import { promptButtons } from "../thread/agent-inbox/components/heading";
 
 import {
@@ -124,12 +124,15 @@ export function Thread() {
     parseAsBoolean.withDefault(true),
   );
   const [input, setInput] = useState("");
+  // for offer id
+  const [selectedOfferId, setSelectedOfferId] = useState("");
   const [firstTokenReceived, setFirstTokenReceived] = useState(false);
   const isLargeScreen = useMediaQuery("(min-width: 1024px)");
 
   const stream = useStreamContext();
   const messages = stream.messages;
   const isLoading = stream.isLoading;
+  console.log("All Messages", messages);
 
   const lastError = useRef<string | undefined>(undefined);
 
@@ -225,6 +228,13 @@ export function Thread() {
     submitMessage(input);
   };
 
+  // to run submit message only when offerID is present
+  useEffect(() => {
+    if (selectedOfferId) {
+      submitMessage(`Book flight with ID ${selectedOfferId}`);
+    }
+  }, [selectedOfferId]);
+
   const handleRegenerate = (
     parentCheckpoint: Checkpoint | null | undefined,
   ) => {
@@ -313,7 +323,7 @@ export function Thread() {
                   <>
                     <Icon />
                     <span className="text-xl font-semibold tracking-tight">
-                      {headHeading}
+                      {getHeadHeading()}
                     </span>
                   </>
                 </motion.button>
@@ -366,6 +376,7 @@ export function Thread() {
                           message={message}
                           isLoading={isLoading}
                           handleRegenerate={handleRegenerate}
+                          onOfferSelect={setSelectedOfferId}
                         />
                       ),
                     )}
@@ -378,6 +389,7 @@ export function Thread() {
                       message={undefined}
                       isLoading={isLoading}
                       handleRegenerate={handleRegenerate}
+                      onOfferSelect={setSelectedOfferId}
                     />
                   )}
                   {isLoading && !firstTokenReceived && (
