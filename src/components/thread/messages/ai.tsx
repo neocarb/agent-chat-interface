@@ -107,6 +107,9 @@ export function AssistantMessage({
 }) {
   const content = message?.content ?? [];
   const contentString = getContentString(content);
+
+  console.log("message", message);
+
   const [hideToolCalls] = useQueryState(
     "hideToolCalls",
     parseAsBoolean.withDefault(true),
@@ -144,43 +147,6 @@ export function AssistantMessage({
     return null;
   }
 
-  // const messageIndex = thread.messages.findIndex((m) => m.id === message?.id);
-  // const prevMessage = thread.messages[messageIndex - 1] as any;
-
-  // const shouldShowExtractedOffers =
-  //   prevMessage?.type === "tool" && prevMessage?.name === "search_offers";
-
-  let currentIndex: number | undefined;
-
-  if (message) {
-    currentIndex = thread.messages.indexOf(message);
-  } else {
-    currentIndex = undefined;
-  }
-
-  const threadMessages = thread.messages;
-
-  const triggerIndex = [...threadMessages].findLastIndex((msg) =>
-    msg.id?.includes("do-not-render-search-offers-run"),
-  );
-
-  const currentIndexOfTypeTool = [...threadMessages].findLastIndex(
-    (msg) => msg.type === "tool",
-  );
-
-  // const shouldShowExtractedOffers =
-  //   triggerIndex !== -1 && currentIndex === triggerIndex - 2;
-
-  const shouldShowExtractedOffers =
-    triggerIndex !== -1 &&
-    currentIndex !== undefined &&
-    (currentIndex === triggerIndex - 2 || currentIndex === triggerIndex - 3);
-
-  console.log("currentIndex", currentIndex);
-  console.log("currentIndexOfTypeTool", currentIndexOfTypeTool);
-  console.log("triggerIndex", triggerIndex);
-  console.log("shouldShowExtractedOffers", shouldShowExtractedOffers);
-
   return (
     <div className="group mr-auto flex items-start gap-2">
       <div className="flex flex-col gap-2">
@@ -195,34 +161,16 @@ export function AssistantMessage({
           </>
         ) : (
           <>
-            {contentString.length > 0 && !shouldShowExtractedOffers && (
+            {message.id?.includes("search-offers-run") ? (
+              <ExtractOfferFromMessages
+                messages={[message]}
+                onOfferSelect={onOfferSelect}
+              />
+            ) : contentString.length > 0 ? (
               <div className="py-1">
                 <MarkdownText>{contentString}</MarkdownText>
               </div>
-            )}
-
-            {shouldShowExtractedOffers && (
-              <ExtractOfferFromMessages
-                messages={[thread.messages[triggerIndex]]}
-                onOfferSelect={onOfferSelect}
-              />
-            )}
-
-            {/* {shouldShowExtractedOffers && (
-              <ExtractOfferFromMessages
-                offer={thread.messages
-                  .filter((msg) => msg.type === "tool")
-                  .map((msg) => ({
-                    name: typeof msg.name === "string" ? msg.name : "",
-                    type: msg.type,
-                    content:
-                      typeof msg.content === "string"
-                        ? msg.content
-                        : JSON.stringify(msg.content),
-                  }))}
-                onOfferSelect={onOfferSelect}
-              />
-            )} */}
+            ) : null}
 
             {!hideToolCalls && (
               <>
@@ -237,7 +185,6 @@ export function AssistantMessage({
                   ))}
               </>
             )}
-
             {message && (
               <CustomComponent
                 message={message}
