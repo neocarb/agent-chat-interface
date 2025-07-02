@@ -14,7 +14,7 @@ import { ThreadView } from "../agent-inbox";
 import { useQueryState, parseAsBoolean } from "nuqs";
 import { GenericInterruptView } from "./generic-interrupt";
 import { useArtifact } from "../artifact";
-import { ExtractOfferFromMessages } from "../agent-inbox/components/extractOffersFromMessage";
+import { ExtractOfferFromMessages } from "../agent-inbox/components/ExtractOfferFromMessages ";
 
 function CustomComponent({
   message,
@@ -144,11 +144,42 @@ export function AssistantMessage({
     return null;
   }
 
-  const messageIndex = thread.messages.findIndex((m) => m.id === message?.id);
-  const prevMessage = thread.messages[messageIndex - 1] as any;
+  // const messageIndex = thread.messages.findIndex((m) => m.id === message?.id);
+  // const prevMessage = thread.messages[messageIndex - 1] as any;
+
+  // const shouldShowExtractedOffers =
+  //   prevMessage?.type === "tool" && prevMessage?.name === "search_offers";
+
+  let currentIndex: number | undefined;
+
+  if (message) {
+    currentIndex = thread.messages.indexOf(message);
+  } else {
+    currentIndex = undefined;
+  }
+
+  const threadMessages = thread.messages;
+
+  const triggerIndex = [...threadMessages].findLastIndex((msg) =>
+    msg.id?.includes("do-not-render-search-offers-run"),
+  );
+
+  const currentIndexOfTypeTool = [...threadMessages].findLastIndex(
+    (msg) => msg.type === "tool",
+  );
+
+  // const shouldShowExtractedOffers =
+  //   triggerIndex !== -1 && currentIndex === triggerIndex - 2;
 
   const shouldShowExtractedOffers =
-    prevMessage?.type === "tool" && prevMessage?.name === "search_offers";
+    triggerIndex !== -1 &&
+    currentIndex !== undefined &&
+    (currentIndex === triggerIndex - 2 || currentIndex === triggerIndex - 3);
+
+  console.log("currentIndex", currentIndex);
+  console.log("currentIndexOfTypeTool", currentIndexOfTypeTool);
+  console.log("triggerIndex", triggerIndex);
+  console.log("shouldShowExtractedOffers", shouldShowExtractedOffers);
 
   return (
     <div className="group mr-auto flex items-start gap-2">
@@ -172,6 +203,13 @@ export function AssistantMessage({
 
             {shouldShowExtractedOffers && (
               <ExtractOfferFromMessages
+                messages={[thread.messages[triggerIndex]]}
+                onOfferSelect={onOfferSelect}
+              />
+            )}
+
+            {/* {shouldShowExtractedOffers && (
+              <ExtractOfferFromMessages
                 offer={thread.messages
                   .filter((msg) => msg.type === "tool")
                   .map((msg) => ({
@@ -184,7 +222,7 @@ export function AssistantMessage({
                   }))}
                 onOfferSelect={onOfferSelect}
               />
-            )}
+            )} */}
 
             {!hideToolCalls && (
               <>
