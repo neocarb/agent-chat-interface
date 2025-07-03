@@ -100,7 +100,7 @@ export function AssistantMessage({
   handleRegenerate,
   onOfferSelect,
 }: {
-  message: Message;
+  message: Message | undefined;
   isLoading: boolean;
   handleRegenerate: (parentCheckpoint: Checkpoint | null | undefined) => void;
   onOfferSelect: (id: string) => void;
