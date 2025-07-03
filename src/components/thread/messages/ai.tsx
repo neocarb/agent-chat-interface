@@ -159,7 +159,7 @@ export function AssistantMessage({
           </>
         ) : (
           <>
-            {message.id?.includes("search-offers-run") ? (
+            {message && message.id?.includes("search-offers-run") ? (
               <ExtractOfferFromMessages
                 messages={[message]}
                 onOfferSelect={onOfferSelect}
