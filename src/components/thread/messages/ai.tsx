@@ -14,7 +14,7 @@ import { ThreadView } from "../agent-inbox";
 import { useQueryState, parseAsBoolean } from "nuqs";
 import { GenericInterruptView } from "./generic-interrupt";
 import { useArtifact } from "../artifact";
-import { ExtractOfferFromMessages } from "../agent-inbox/components/ExtractOfferFromMessages ";
+import { ExtractOfferFromMessages } from "../agent-inbox/components/ExtractOfferFromMessages";
 
 function CustomComponent({
   message,
