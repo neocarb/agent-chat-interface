@@ -47,7 +47,6 @@ function MessagesRenderer({ messages }: { messages: BaseMessage[] }) {
       {messages.map((msg, idx) => {
         const messageTypeLabel = messageTypeToLabel(msg);
 
-        // SKIP showing content for search_offers tool messages
         const isSearchOffersTool =
           "type" in msg &&
           msg.type === "tool" &&
@@ -55,7 +54,7 @@ function MessagesRenderer({ messages }: { messages: BaseMessage[] }) {
           msg.name === "search_offers";
 
         if (isSearchOffersTool) {
-          return null; // Skip rendering this message block completely
+          return null;
         }
 
         const content =
@@ -70,7 +69,7 @@ function MessagesRenderer({ messages }: { messages: BaseMessage[] }) {
           >
             <p className="font-medium text-gray-700">{messageTypeLabel}:</p>
 
-            {/* his will now skip if it's a search_offers tool */}
+            {/* this will now skip if it's a search_offers tool */}
             {content && <MarkdownText>{content}</MarkdownText>}
 
             {"tool_calls" in msg && msg.tool_calls ? (

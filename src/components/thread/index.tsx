@@ -130,7 +130,7 @@ export function Thread() {
 
   const stream = useStreamContext();
   const messages = stream.messages;
-  console.log("MEssages", messages);
+  console.log("Messages", messages);
   const isLoading = stream.isLoading;
 
   const lastError = useRef<string | undefined>(undefined);
@@ -475,7 +475,10 @@ export function Thread() {
                               key="stop"
                               onClick={() => stream.stop()}
                             >
-                              <LoaderCircle className="h-4 w-4 animate-spin" />
+                              <LoaderCircle
+                                className="h-4 w-4 animate-spin"
+                                strokeWidth={4}
+                              />
                               Cancel
                             </Button>
                           ) : (

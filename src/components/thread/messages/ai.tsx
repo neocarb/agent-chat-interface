@@ -105,10 +105,9 @@ export function AssistantMessage({
   handleRegenerate: (parentCheckpoint: Checkpoint | null | undefined) => void;
   onOfferSelect: (id: string) => void;
 }) {
+  if (!message) return null;
   const content = message?.content ?? [];
   const contentString = getContentString(content);
-
-  console.log("message", message);
 
   const [hideToolCalls] = useQueryState(
     "hideToolCalls",
