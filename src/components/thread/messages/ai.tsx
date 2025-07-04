@@ -14,6 +14,7 @@ import { ThreadView } from "../agent-inbox";
 import { useQueryState, parseAsBoolean } from "nuqs";
 import { GenericInterruptView } from "./generic-interrupt";
 import { useArtifact } from "../artifact";
+import { ExtractOfferFromMessages } from "../agent-inbox/components/ExtractOfferFromMessages";
 
 function CustomComponent({
   message,
@@ -97,19 +98,22 @@ export function AssistantMessage({
   message,
   isLoading,
   handleRegenerate,
+  onOfferSelect,
 }: {
   message: Message | undefined;
   isLoading: boolean;
   handleRegenerate: (parentCheckpoint: Checkpoint | null | undefined) => void;
+  onOfferSelect: (id: string) => void;
 }) {
-  const content = message?.content ?? [];
-  const contentString = getContentString(content);
   const [hideToolCalls] = useQueryState(
     "hideToolCalls",
     parseAsBoolean.withDefault(true),
   );
 
   const thread = useStreamContext();
+  const content = message?.content ?? [];
+  const contentString = getContentString(content);
+
   const isLastMessage =
     thread.messages[thread.messages.length - 1].id === message?.id;
   const hasNoAIOrToolMessages = !thread.messages.find(
@@ -140,6 +144,10 @@ export function AssistantMessage({
     return null;
   }
 
+  if (message == undefined) {
+    return null;
+  }
+
   return (
     <div className="group mr-auto flex items-start gap-2">
       <div className="flex flex-col gap-2">
@@ -154,11 +162,16 @@ export function AssistantMessage({
           </>
         ) : (
           <>
-            {contentString.length > 0 && (
+            {message && message.id?.includes("search-offers-run") ? (
+              <ExtractOfferFromMessages
+                messages={[message]}
+                onOfferSelect={onOfferSelect}
+              />
+            ) : contentString.length > 0 ? (
               <div className="py-1">
                 <MarkdownText>{contentString}</MarkdownText>
               </div>
-            )}
+            ) : null}
 
             {!hideToolCalls && (
               <>
@@ -173,7 +186,6 @@ export function AssistantMessage({
                   ))}
               </>
             )}
-
             {message && (
               <CustomComponent
                 message={message}

@@ -10,11 +10,9 @@ import { Button } from "../ui/button";
 import { Checkpoint, Message } from "@langchain/langgraph-sdk";
 import { AssistantMessage, AssistantMessageLoading } from "./messages/ai";
 import { HumanMessage } from "./messages/human";
-import { MarkdownText } from "./markdown-text";
-import Heading, {
-  agentIconMap,
-} from "../thread/agent-inbox/components/heading";
-import { headHeading } from "../thread/agent-inbox/components/heading";
+import { agentIconMap } from "../thread/agent-inbox/components/heading";
+import Heading from "../thread/agent-inbox/components/heading";
+import { getHeadHeading } from "../thread/agent-inbox/components/heading";
 import { promptButtons } from "../thread/agent-inbox/components/heading";
 
 import {
@@ -124,11 +122,15 @@ export function Thread() {
     parseAsBoolean.withDefault(true),
   );
   const [input, setInput] = useState("");
+  // for  offer Id
+  const [selectedOfferId, setSelectedOfferId] = useState("");
+
   const [firstTokenReceived, setFirstTokenReceived] = useState(false);
   const isLargeScreen = useMediaQuery("(min-width: 1024px)");
 
   const stream = useStreamContext();
   const messages = stream.messages;
+  console.log("Messages", messages);
   const isLoading = stream.isLoading;
 
   const lastError = useRef<string | undefined>(undefined);
@@ -225,6 +227,13 @@ export function Thread() {
     submitMessage(input);
   };
 
+  // to run submit message only when offerID is present
+  useEffect(() => {
+    if (selectedOfferId) {
+      submitMessage(`Book flight with ID ${selectedOfferId}`);
+    }
+  }, [selectedOfferId]);
+
   const handleRegenerate = (
     parentCheckpoint: Checkpoint | null | undefined,
   ) => {
@@ -243,7 +252,7 @@ export function Thread() {
   );
 
   return (
-    <div className="flex min-h-screen w-full overflow-hidden bg-gradient-to-br from-[#dceefb] via-[#bcdff5] to-[#a3d8f4]">
+    <div className="flex min-h-screen w-full overflow-hidden bg-gradient-to-br from-sky-100 via-sky-100 to-sky-100">
       <div className="relative hidden lg:flex">
         <motion.div
           className="absolute z-20 h-full overflow-hidden border-r bg-white"
@@ -313,7 +322,7 @@ export function Thread() {
                   <>
                     <Icon />
                     <span className="text-xl font-semibold tracking-tight">
-                      {headHeading}
+                      {getHeadHeading()}
                     </span>
                   </>
                 </motion.button>
@@ -335,7 +344,7 @@ export function Thread() {
                 <>
                   {/* List of functional pills  */}
                   {!chatStarted && (
-                    <div className="flex flex-col justify-between gap-3 sm:flex-row">
+                    <div className="z-10 flex flex-col justify-between gap-3 sm:flex-row">
                       {promptButtons.map(({ label, prompt }) => (
                         <button
                           key={label}
@@ -366,6 +375,7 @@ export function Thread() {
                           message={message}
                           isLoading={isLoading}
                           handleRegenerate={handleRegenerate}
+                          onOfferSelect={setSelectedOfferId}
                         />
                       ),
                     )}
@@ -378,6 +388,7 @@ export function Thread() {
                       message={undefined}
                       isLoading={isLoading}
                       handleRegenerate={handleRegenerate}
+                      onOfferSelect={setSelectedOfferId}
                     />
                   )}
                   {isLoading && !firstTokenReceived && (
@@ -464,7 +475,10 @@ export function Thread() {
                               key="stop"
                               onClick={() => stream.stop()}
                             >
-                              <LoaderCircle className="h-4 w-4 animate-spin" />
+                              <LoaderCircle
+                                className="h-4 w-4 animate-spin"
+                                strokeWidth={4}
+                              />
                               Cancel
                             </Button>
                           ) : (
