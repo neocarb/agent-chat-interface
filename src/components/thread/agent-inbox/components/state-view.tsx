@@ -69,7 +69,6 @@ function MessagesRenderer({ messages }: { messages: BaseMessage[] }) {
           >
             <p className="font-medium text-gray-700">{messageTypeLabel}:</p>
 
-            {/* this will now skip if it's a search_offers tool */}
             {content && <MarkdownText>{content}</MarkdownText>}
 
             {"tool_calls" in msg && msg.tool_calls ? (

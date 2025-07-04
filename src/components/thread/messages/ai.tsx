@@ -105,15 +105,14 @@ export function AssistantMessage({
   handleRegenerate: (parentCheckpoint: Checkpoint | null | undefined) => void;
   onOfferSelect: (id: string) => void;
 }) {
-  const content = message?.content ?? [];
-  const contentString = getContentString(content);
-
   const [hideToolCalls] = useQueryState(
     "hideToolCalls",
     parseAsBoolean.withDefault(true),
   );
 
   const thread = useStreamContext();
+  const content = message?.content ?? [];
+  const contentString = getContentString(content);
 
   const isLastMessage =
     thread.messages[thread.messages.length - 1].id === message?.id;
@@ -142,6 +141,10 @@ export function AssistantMessage({
   const isToolResult = message?.type === "tool";
 
   if (isToolResult && hideToolCalls) {
+    return null;
+  }
+
+  if (message == undefined) {
     return null;
   }
 
