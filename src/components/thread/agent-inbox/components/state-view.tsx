@@ -68,19 +68,7 @@ function MessagesRenderer({ messages }: { messages: BaseMessage[] }) {
             className="ml-2 flex w-full flex-col gap-[2px]"
           >
             <p className="font-medium text-gray-700">{messageTypeLabel}:</p>
-
             {content && <MarkdownText>{content}</MarkdownText>}
-
-            {"tool_calls" in msg && msg.tool_calls ? (
-              <div className="flex w-full flex-col items-start gap-1">
-                {(msg.tool_calls as ToolCall[]).map((tc, idx) => (
-                  <ToolCallTable
-                    key={tc.id ?? `tool-call-${idx}`}
-                    toolCall={tc}
-                  />
-                ))}
-              </div>
-            ) : null}
           </div>
         );
       })}
